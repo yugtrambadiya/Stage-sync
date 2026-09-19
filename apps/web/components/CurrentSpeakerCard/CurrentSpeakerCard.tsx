@@ -12,11 +12,12 @@ interface Props {
 
 function getInitials(name: string): string {
   if (!name) return 'ST';
-  const parts = name.trim().split(/\s+/);
+  const clean = name.replace(/^(Dr\.|Prof\.|Mr\.|Ms\.|Mrs\.)\s+/i, '').trim();
+  const parts = clean.split(/\s+/);
   if (parts.length >= 2) {
     return (parts[0][0] + parts[1][0]).toUpperCase();
   }
-  return name.slice(0, 2).toUpperCase();
+  return clean.slice(0, 2).toUpperCase();
 }
 
 function formatSeconds(totalSec: number): string {
