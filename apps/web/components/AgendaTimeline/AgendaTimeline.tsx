@@ -58,35 +58,39 @@ export function AgendaTimeline({
     }
   }, [items]);
 
-  // FLIP animation for row re-ordering / reflow
+  // FLIP animation for row re-ordering / reflow — only runs when items array actually changes
   useLayoutEffect(() => {
     if (!containerRef.current) return;
+    const containerTop = containerRef.current.getBoundingClientRect().top;
     const itemEls = containerRef.current.querySelectorAll<HTMLDivElement>('[data-item-id]');
 
     itemEls.forEach((el) => {
       const id = el.getAttribute('data-item-id')!;
-      const newTop = el.getBoundingClientRect().top;
+      // Relative to container so page scrolling never changes relative top!
+      const newTop = el.getBoundingClientRect().top - containerTop;
       const oldTop = prevPositions.current.get(id);
 
-      if (oldTop !== undefined && oldTop !== newTop) {
+      if (oldTop !== undefined && Math.abs(oldTop - newTop) > 1) {
         const deltaY = oldTop - newTop;
         el.style.transform = `translateY(${deltaY}px)`;
         el.style.transition = 'none';
 
         requestAnimationFrame(() => {
-          el.style.transition = 'transform 300ms ease';
+          el.style.transition = 'transform 300ms cubic-bezier(0.2, 0, 0, 1)';
           el.style.transform = '';
         });
       }
 
       prevPositions.current.set(id, newTop);
     });
-  });
+  }, [items]);
 
-  // Auto-scroll the live row into view
+  // Auto-scroll the live row into view once on mount without hijacking physical user scrolling
+  const hasAutoScrolled = useRef(false);
   useEffect(() => {
-    if (liveRowRef.current) {
-      liveRowRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (!hasAutoScrolled.current && liveRowRef.current) {
+      hasAutoScrolled.current = true;
+      liveRowRef.current.scrollIntoView({ block: 'nearest' });
     }
   }, [items]);
 

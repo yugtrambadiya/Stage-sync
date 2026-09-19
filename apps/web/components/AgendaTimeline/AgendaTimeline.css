@@ -58,9 +58,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  overflow-y: auto;
-  max-height: calc(100vh - 220px);
-  padding-right: var(--space-2);
 }
 
 .timeline__item {

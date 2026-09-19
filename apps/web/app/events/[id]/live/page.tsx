@@ -308,7 +308,7 @@ export default function LiveDashboardPage() {
           </section>
 
           {/* Right Column: Stage Controls */}
-          <section style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+          <section style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', position: 'sticky', top: 'calc(var(--header-h, 56px) + 50px)' }}>
             {/* 1. NOW ON STAGE */}
             <CurrentSpeakerCard
               item={currentSession}
@@ -363,7 +363,7 @@ export default function LiveDashboardPage() {
                 {activityLog.length === 0 ? (
                   <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>No recent activity</div>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', maxHeight: '180px', overflowY: 'auto' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', maxHeight: '180px', overflowY: 'auto', overscrollBehavior: 'contain' }}>
                     {activityLog.map((log) => (
                       <div
                         key={log.id}
