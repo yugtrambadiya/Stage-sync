@@ -530,3 +530,17 @@
   text-decoration: line-through;
   margin-right: 4px;
 }
+
+/* Control room grid */
+.control-room-grid {
+  display: grid;
+  grid-template-columns: minmax(380px, 1.2fr) minmax(320px, 0.9fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .control-room-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
