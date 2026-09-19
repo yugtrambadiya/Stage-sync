@@ -11,9 +11,10 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "rootDir": "src",
     "paths": {
-      "@smart-anchor/database": ["../../packages/database/src"],
-      "@smart-anchor/shared": ["../../packages/shared/src"]
+      "@smart-anchor/database": ["../../packages/database/dist"],
+      "@smart-anchor/shared": ["../../packages/shared/dist"]
     },
     "incremental": true,
     "strict": true,
