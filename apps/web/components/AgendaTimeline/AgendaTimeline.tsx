@@ -20,6 +20,25 @@ function formatTime(iso: string): string {
   }
 }
 
+function getInitials(name?: string): string {
+  if (!name) return 'SP';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+}
+
+function getTrackCategory(title: string): { label: string; tone: string } {
+  const t = title.toLowerCase();
+  if (t.includes('keynote')) return { label: 'KEYNOTE', tone: 'keynote' };
+  if (t.includes('panel')) return { label: 'PANEL', tone: 'panel' };
+  if (t.includes('workshop')) return { label: 'WORKSHOP', tone: 'workshop' };
+  if (t.includes('lunch') || t.includes('break') || t.includes('networking')) return { label: 'NETWORKING', tone: 'break' };
+  if (t.includes('ceremony') || t.includes('awards') || t.includes('closing') || t.includes('hackathon')) return { label: 'CEREMONY', tone: 'ceremony' };
+  return { label: 'DEEP DIVE', tone: 'talk' };
+}
+
 export function AgendaTimeline({
   items,
   loading = false,
@@ -66,7 +85,6 @@ export function AgendaTimeline({
 
     itemEls.forEach((el) => {
       const id = el.getAttribute('data-item-id')!;
-      // Relative to container so page scrolling never changes relative top!
       const newTop = el.getBoundingClientRect().top - containerTop;
       const oldTop = prevPositions.current.get(id);
 
@@ -85,12 +103,15 @@ export function AgendaTimeline({
     });
   }, [items]);
 
-  // Auto-scroll the live row into view once on mount without hijacking physical user scrolling
+  // Auto-scroll the live row into view once on mount without hiding under the fixed header
   const hasAutoScrolled = useRef(false);
   useEffect(() => {
     if (!hasAutoScrolled.current && liveRowRef.current) {
       hasAutoScrolled.current = true;
-      liveRowRef.current.scrollIntoView({ block: 'nearest' });
+      const rect = liveRowRef.current.getBoundingClientRect();
+      if (rect.top < 85 || rect.bottom > window.innerHeight) {
+        liveRowRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
     }
   }, [items]);
 
@@ -110,7 +131,12 @@ export function AgendaTimeline({
   return (
     <div className="timeline panel" ref={containerRef}>
       <div className="timeline__header">
-        <span className="panel__title" style={{ margin: 0 }}>Agenda Timeline</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span className="panel__title" style={{ margin: 0, padding: 0, border: 'none', background: 'transparent' }}>
+            Live Agenda Timeline
+          </span>
+          <span className="timeline__flow-indicator" title="Live Continuous Stage Stream">● CONTINUOUS</span>
+        </div>
         <span className="timeline__count num">{items.length} sessions</span>
       </div>
 
@@ -118,7 +144,7 @@ export function AgendaTimeline({
       {lastDiff && (
         <div className="timeline__diff-strip" role="status">
           <span className="timeline__diff-title">
-            <span>⚠ Schedule Updated · {lastDiff.impact.affectedCount} items shifted (+{lastDiff.delayMinutes} min)</span>
+            <span>⚠ Schedule Cascade Updated · {lastDiff.impact.affectedCount} sessions shifted (+{lastDiff.delayMinutes} min)</span>
           </span>
           {onDismissDiff && (
             <button
@@ -142,11 +168,13 @@ export function AgendaTimeline({
             const isCompleted = item.status === 'COMPLETED';
             const isUpcoming = item.status === 'UPCOMING' || item.status === 'READY';
             const ghostTime = ghostTimes[item.id];
+            const category = getTrackCategory(item.title);
+            const initials = getInitials(item.speaker?.name);
 
             const statusBadge = isLive ? (
-              <span className="badge badge--live">● LIVE</span>
+              <span className="badge badge--live">● ON AIR</span>
             ) : isDelayed ? (
-              <span className="badge badge--delayed">DELAYED</span>
+              <span className="badge badge--delayed">DRIFT</span>
             ) : isCompleted ? (
               <span className="badge badge--completed">DONE</span>
             ) : (
@@ -168,7 +196,7 @@ export function AgendaTimeline({
                     : ''
                 }`}
               >
-                {/* Time col */}
+                {/* Time column with visual connector rail */}
                 <div className="timeline__time-col">
                   {ghostTime && (
                     <span className="timeline__ghost-time">
@@ -183,27 +211,57 @@ export function AgendaTimeline({
                   </span>
                 </div>
 
-                {/* Content col */}
+                {/* Content column */}
                 <div className="timeline__content-col">
+                  <div className="timeline__tag-row">
+                    <span className={`timeline__tag timeline__tag--${category.tone}`}>
+                      {category.label}
+                    </span>
+                    {isLive && (
+                      <span className="timeline__soundwave" title="Audio on stage">
+                        <span /><span /><span /><span />
+                      </span>
+                    )}
+                  </div>
+
                   <div className="timeline__title" title={item.title}>
                     {item.title}
                   </div>
-                  <div className="timeline__speaker">
-                    {item.speaker?.name ?? 'No speaker assigned'}
-                    {item.speaker?.organization ? ` · ${item.speaker.organization}` : ''}
+
+                  <div className="timeline__speaker-row">
+                    <div
+                      className={`timeline__avatar ${isLive ? 'timeline__avatar--live' : ''}`}
+                      title={item.speaker?.name ?? 'Speaker'}
+                    >
+                      {initials}
+                    </div>
+                    <div className="timeline__speaker-meta">
+                      <span className="timeline__speaker-name">
+                        {item.speaker?.name ?? 'No speaker assigned'}
+                      </span>
+                      {item.speaker?.organization && (
+                        <span className="timeline__speaker-org">
+                          {item.speaker.organization}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* Meta col */}
+                {/* Meta column with Status Badge + Always-visible Mark Delay button */}
                 <div className="timeline__meta-col">
                   {statusBadge}
                   {(isLive || isUpcoming || isDelayed) && (
                     <button
-                      className="btn btn--ghost btn--sm timeline__delay-btn"
-                      onClick={() => onDelayItem(item)}
-                      title="Adjust timing"
+                      className="timeline__delay-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelayItem(item);
+                      }}
+                      title={`Mark timing delay for ${item.title}`}
                     >
-                      Delay
+                      <span className="timeline__delay-btn-icon" aria-hidden="true">⏱️</span>
+                      <span className="timeline__delay-btn-label">Mark Delay</span>
                     </button>
                   )}
                 </div>

@@ -1,24 +1,43 @@
 /* ─── Modern Next Up Preview Card ────────────────────────────────────────── */
 
 .nuc {
-  background: var(--color-surface);
+  background: rgba(13, 16, 26, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
   overflow: hidden;
-  transition: border-color var(--dur-fast) var(--ease-out);
+  transition: all var(--dur-fast) var(--ease-out);
 }
 
 .nuc:hover {
   border-color: var(--color-border-hover);
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.6), 0 0 20px -4px rgba(99, 102, 241, 0.2);
 }
 
 .nuc__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-4) var(--space-6);
+  padding: 12px 20px;
   border-bottom: 1px solid var(--color-border-subtle);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.nuc__header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nuc__radar {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 8px var(--color-accent);
+  animation: subtle-pulse 2s infinite ease-in-out;
 }
 
 .nuc__empty {
@@ -29,7 +48,7 @@
 }
 
 .nuc__body {
-  padding: var(--space-5) var(--space-6);
+  padding: 16px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -39,7 +58,7 @@
 .nuc__left {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: 14px;
   min-width: 0;
 }
 
@@ -49,10 +68,10 @@
   align-items: center;
   justify-content: center;
   background: rgba(99, 102, 241, 0.12);
-  border: 1px solid rgba(99, 102, 241, 0.25);
+  border: 1px solid rgba(99, 102, 241, 0.3);
   border-radius: var(--radius-md);
   padding: 8px 12px;
-  min-width: 72px;
+  min-width: 68px;
   flex-shrink: 0;
 }
 
@@ -60,7 +79,7 @@
   font-family: var(--font-mono);
   font-size: var(--text-md);
   font-weight: 700;
-  color: #818cf8;
+  color: #a5b4fc;
   letter-spacing: -0.02em;
   line-height: 1.1;
 }
@@ -70,6 +89,22 @@
   font-size: 10px;
   color: var(--color-text-muted);
   margin-top: 2px;
+}
+
+.nuc__avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .nuc__content {
@@ -95,4 +130,21 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.nuc__draft-btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.12);
+  transition: all var(--dur-fast);
+}
+
+.nuc__draft-btn:hover {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #c7d2fe;
 }

@@ -458,47 +458,78 @@ export default function LiveDashboardPage() {
             />
 
             {/* 3. BROADCAST ACTIONS PANEL */}
-            <div className="panel" style={{ padding: 'var(--space-4)' }}>
+            <div className="panel" style={{ padding: 'var(--space-4)', background: 'rgba(13, 16, 26, 0.85)', backdropFilter: 'blur(16px)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xl)', boxShadow: '0 12px 28px -8px rgba(0,0,0,0.5)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
-                <span className="panel__title" style={{ margin: 0, fontSize: 'var(--text-xs)', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-                  Stage Director Actions
+                <span className="panel__title" style={{ margin: 0, padding: 0, border: 'none', background: 'transparent', fontSize: 'var(--text-xs)', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
+                  Stage Director Quick Actions
                 </span>
-                <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-                  Hotkeys Active
+                <span style={{ fontSize: '10px', color: 'var(--color-live)', background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '2px 8px', borderRadius: 'var(--radius-pill)', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
+                  HOTKEYS LIVE
                 </span>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
                 <button
                   className="btn btn--primary btn--sm"
                   onClick={() => handleOpenScript(0, 'TRANSITION')}
-                  style={{ justifyContent: 'space-between', padding: '8px 12px' }}
+                  style={{
+                    justifyContent: 'space-between',
+                    padding: '10px 14px',
+                    borderRadius: 'var(--radius-md)',
+                    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                    boxShadow: '0 4px 14px rgba(99, 102, 241, 0.35)',
+                    fontWeight: 600,
+                  }}
                 >
                   <span>✨ Generate Script</span>
-                  <span className="kbd" style={{ background: 'rgba(255,255,255,0.2)', borderColor: 'rgba(255,255,255,0.3)', color: '#fff' }}>G</span>
+                  <span className="kbd" style={{ background: 'rgba(255,255,255,0.22)', borderColor: 'rgba(255,255,255,0.35)', color: '#fff', fontWeight: 700 }}>G</span>
                 </button>
                 <button
-                  className="btn btn--secondary btn--sm"
+                  className="btn btn--sm"
                   onClick={handleOpenDelayForCurrent}
-                  style={{ justifyContent: 'space-between', padding: '8px 12px' }}
+                  style={{
+                    justifyContent: 'space-between',
+                    padding: '10px 14px',
+                    borderRadius: 'var(--radius-md)',
+                    background: 'rgba(245, 158, 11, 0.12)',
+                    border: '1px solid rgba(245, 158, 11, 0.4)',
+                    color: '#fbbf24',
+                    fontWeight: 600,
+                  }}
                 >
                   <span>⏱️ Mark Delay</span>
-                  <span className="kbd">D</span>
+                  <span className="kbd" style={{ background: 'rgba(245, 158, 11, 0.25)', borderColor: 'rgba(245, 158, 11, 0.5)', color: '#fbbf24', fontWeight: 700 }}>D</span>
                 </button>
                 <button
                   className="btn btn--ghost btn--sm"
                   onClick={() => setAnnounceModalOpen(true)}
-                  style={{ justifyContent: 'space-between', padding: '8px 12px' }}
+                  style={{
+                    justifyContent: 'space-between',
+                    padding: '10px 14px',
+                    borderRadius: 'var(--radius-md)',
+                    background: 'rgba(6, 182, 212, 0.08)',
+                    border: '1px solid rgba(6, 182, 212, 0.25)',
+                    color: '#22d3ee',
+                    fontWeight: 600,
+                  }}
                 >
                   <span>📣 Announce</span>
-                  <span className="kbd">A</span>
+                  <span className="kbd" style={{ background: 'rgba(6, 182, 212, 0.2)', borderColor: 'rgba(6, 182, 212, 0.4)', color: '#22d3ee', fontWeight: 700 }}>A</span>
                 </button>
                 <button
                   className="btn btn--ghost btn--sm"
                   onClick={() => setShortcutsOpen(true)}
-                  style={{ justifyContent: 'space-between', padding: '8px 12px' }}
+                  style={{
+                    justifyContent: 'space-between',
+                    padding: '10px 14px',
+                    borderRadius: 'var(--radius-md)',
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    border: '1px solid var(--color-border)',
+                    color: 'var(--color-text-secondary)',
+                    fontWeight: 600,
+                  }}
                 >
                   <span>⌨️ Shortcuts</span>
-                  <span className="kbd">?</span>
+                  <span className="kbd" style={{ fontWeight: 700 }}>?</span>
                 </button>
               </div>
             </div>

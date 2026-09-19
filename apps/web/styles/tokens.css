@@ -5,35 +5,35 @@
 :root {
   /* ── Colour — Base & Obsidian Surfaces ──────────────────────────────────── */
   --color-bg:               #07080c;
-  --color-bg-subtle:        #0c0e14;
-  --color-surface:          rgba(15, 18, 27, 0.72);
-  --color-surface-solid:    #11141f;
-  --color-surface-elevated: rgba(22, 26, 38, 0.82);
-  --color-surface-hover:    rgba(30, 35, 52, 0.9);
+  --color-bg-subtle:        #0c0e16;
+  --color-surface:          rgba(13, 16, 26, 0.78);
+  --color-surface-solid:    #0f121d;
+  --color-surface-elevated: rgba(20, 25, 40, 0.88);
+  --color-surface-hover:    rgba(28, 35, 56, 0.94);
   
   /* ── Hairline Translucent Borders ───────────────────────────────────────── */
-  --color-border:           rgba(255, 255, 255, 0.08);
-  --color-border-subtle:    rgba(255, 255, 255, 0.04);
-  --color-border-hover:     rgba(255, 255, 255, 0.16);
-  --color-border-active:    rgba(99, 102, 241, 0.45);
+  --color-border:           rgba(255, 255, 255, 0.09);
+  --color-border-subtle:    rgba(255, 255, 255, 0.05);
+  --color-border-hover:     rgba(255, 255, 255, 0.2);
+  --color-border-active:    rgba(99, 102, 241, 0.55);
 
   /* ── Colour — Accent & Glows ────────────────────────────────────────────── */
   --color-accent:           #6366f1;
   --color-accent-hover:     #7578f7;
-  --color-accent-gradient:  linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  --color-accent-glow:      rgba(99, 102, 241, 0.22);
-  --color-accent-bg:        rgba(99, 102, 241, 0.1);
+  --color-accent-gradient:  linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+  --color-accent-glow:      rgba(99, 102, 241, 0.3);
+  --color-accent-bg:        rgba(99, 102, 241, 0.12);
 
   /* ── Colour — Broadcast Signals ─────────────────────────────────────────── */
   --color-live:             #10b981;
-  --color-live-glow:        rgba(16, 185, 129, 0.28);
-  --color-live-bg:          rgba(16, 185, 129, 0.12);
+  --color-live-glow:        rgba(16, 185, 129, 0.35);
+  --color-live-bg:          rgba(16, 185, 129, 0.14);
   --color-warn:             #f59e0b;
-  --color-warn-glow:        rgba(245, 158, 11, 0.24);
-  --color-warn-bg:          rgba(245, 158, 11, 0.12);
+  --color-warn-glow:        rgba(245, 158, 11, 0.32);
+  --color-warn-bg:          rgba(245, 158, 11, 0.14);
   --color-danger:           #ef4444;
-  --color-danger-glow:      rgba(239, 68, 68, 0.24);
-  --color-danger-bg:        rgba(239, 68, 68, 0.12);
+  --color-danger-glow:      rgba(239, 68, 68, 0.32);
+  --color-danger-bg:        rgba(239, 68, 68, 0.14);
 
   /* ── Colour — Typography ────────────────────────────────────────────────── */
   --color-text:             #f8fafc;

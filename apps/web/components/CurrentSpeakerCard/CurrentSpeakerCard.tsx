@@ -94,12 +94,20 @@ export function CurrentSpeakerCard({ item, onDelay, onScript }: Props) {
     <div className={`csc ${statusClass}`}>
       <div className="csc__header">
         <div className="csc__badge-group">
-          <span className="badge badge--live">ON AIR</span>
+          <span className="badge badge--live">
+            <span className="csc__live-dot" />
+            ON AIR
+          </span>
+          <div className="csc__audio-wave" title="Stage Mic Active">
+            <span /><span /><span /><span /><span />
+          </div>
           {item.status === 'DELAYED' && <span className="badge badge--delayed">DRIFT DETECTED</span>}
         </div>
-        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-          {item.durationMinutes} MIN ALLOTTED
-        </span>
+        <div className="csc__header-meta">
+          <span className="csc__allotted-tag num">
+            {item.durationMinutes} MIN ALLOTTED
+          </span>
+        </div>
       </div>
 
       <div className="csc__body">
@@ -107,6 +115,7 @@ export function CurrentSpeakerCard({ item, onDelay, onScript }: Props) {
         <div className="csc__profile">
           <div className="csc__avatar" title={speakerName}>
             {initials}
+            <span className="csc__avatar-mic" title="Mic Live" />
           </div>
           <div className="csc__details">
             <div className="csc__speaker">{speakerName}</div>
@@ -117,15 +126,19 @@ export function CurrentSpeakerCard({ item, onDelay, onScript }: Props) {
         </div>
 
         {/* Session Title */}
-        <div className="csc__title">{item.title}</div>
+        <div className="csc__title-card">
+          <span className="csc__title-tag">CURRENT KEYNOTE</span>
+          <div className="csc__title">{item.title}</div>
+        </div>
 
         {/* Live Countdown HUD */}
         <div className="csc__hud">
           <div className="csc__hud-top">
             <span className="csc__hud-label">
-              {isOverrun ? 'Overrun Time' : 'Time Remaining'}
+              <span className={`csc__hud-indicator ${isOverrun ? 'csc__hud-indicator--overrun' : isWarning ? 'csc__hud-indicator--warn' : 'csc__hud-indicator--live'}`} />
+              {isOverrun ? 'OVERRUN TIME' : 'TIME REMAINING'}
             </span>
-            <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
+            <span className="csc__hud-total num">
               Total: {item.durationMinutes}m
             </span>
           </div>
@@ -134,22 +147,34 @@ export function CurrentSpeakerCard({ item, onDelay, onScript }: Props) {
             {formatSeconds(remainingSec)}
           </div>
 
-          {/* Progress Bar */}
-          <div className="csc__progress" suppressHydrationWarning>
-            <div
-              className={`csc__progress-fill ${isWarning || isOverrun ? 'csc__progress-fill--warn' : ''}`}
-              style={{ width: `${progress}%` }}
-            />
+          {/* Progress Bar & Status Pill */}
+          <div className="csc__progress-container">
+            <div className="csc__progress" suppressHydrationWarning>
+              <div
+                className={`csc__progress-fill ${isWarning || isOverrun ? 'csc__progress-fill--warn' : ''}`}
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <div className="csc__progress-labels">
+              <span className="csc__progress-sub">
+                {isOverrun ? 'Schedule delayed downstream' : 'Active presentation pace'}
+              </span>
+              <span className="csc__progress-pct num" suppressHydrationWarning>
+                {Math.round(progress)}% ELAPSED
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Actions */}
+        {/* Action Controls */}
         <div className="csc__actions">
-          <button className="btn btn--primary" onClick={onScript} title="Generate AI transition announcement">
-            ✨ Generate Script
+          <button className="btn btn--primary csc__action-btn csc__action-btn--hero" onClick={onScript} title="Generate AI transition announcement">
+            <span>✨ Generate Script</span>
+            <kbd className="csc__kbd">G</kbd>
           </button>
-          <button className="btn btn--ghost" onClick={onDelay} title="Introduce a timing delay and cascade downstream">
-            ⏱ Adjust Time
+          <button className="csc__delay-action-btn" onClick={onDelay} title="Mark schedule delay and cascade downstream">
+            <span className="csc__delay-action-text">⏱️ Mark Delay</span>
+            <kbd className="csc__kbd csc__kbd--warn">D</kbd>
           </button>
         </div>
       </div>
