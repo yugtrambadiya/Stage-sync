@@ -7,12 +7,12 @@ import {
   Param,
   Body,
   Query,
-  Headers,
+  Req,
   Res,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -72,15 +72,20 @@ export class AgendaController {
     summary: 'Apply a cascading delay',
     description: 'Shifts the item and all downstream items by N minutes. Uses Serializable transaction + advisory lock.',
   })
-  @ApiHeader({ name: 'Idempotency-Key', required: false, description: 'Unique key to prevent duplicate shifts' })
+  @ApiHeader({ name: 'Idempotency-Key', required: false, description: 'Optional unique key to prevent duplicate shifts' })
   @ApiResponse({ status: 400, description: 'DELAY_CROSSES_MIDNIGHT or invalid delayMinutes' })
   @ApiResponse({ status: 409, description: 'SCHEDULE_OVERLAP or CONCURRENT_MODIFICATION' })
   async delay(
     @Param('id') id: string,
     @Body() dto: DelayAgendaItemDto,
-    @Headers('idempotency-key') idempotencyKey?: string,
+    @Req() req: Request,
     @Res({ passthrough: true }) res?: Response,
   ) {
+    const idempotencyKey =
+      (req.headers['idempotency-key'] as string) ||
+      (req.headers['Idempotency-Key'] as string) ||
+      undefined;
+
     const result = await this.agendaService.cascadeDelay(id, dto, { dryRun: false, idempotencyKey });
     if ((result as any)._idempotentReplay && res) {
       res.setHeader('Idempotent-Replay', 'true');
