@@ -1,0 +1,19 @@
+{
+  "name": "smart-anchor",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@10.15.0",
+  "scripts": {
+    "dev": "pnpm --parallel --filter @smart-anchor/web --filter @smart-anchor/api dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "db:generate": "pnpm --filter @smart-anchor/database prisma generate",
+    "db:migrate": "pnpm --filter @smart-anchor/database prisma migrate dev",
+    "db:studio": "pnpm --filter @smart-anchor/database prisma studio"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  }
+}

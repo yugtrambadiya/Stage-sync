@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Event {
+  id          String          @id @default(cuid())
+  name        String
+  description String?
+  venue       String?
+  date        DateTime
+  timezone    String          @default("Asia/Kolkata")
+  status      EventStatus     @default(DRAFT)
+  agendaItems AgendaItem[]
+  speakers    Speaker[]
+  scripts     Script[]
+  changes     ScheduleChange[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model Speaker {
+  id           String       @id @default(cuid())
+  eventId      String
+  name         String
+  designation  String?
+  organization String?
+  biography    String?
+  expertise    String[]
+  event        Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  agendaItems  AgendaItem[]
+  createdAt    DateTime     @default(now())
+}
+
+model AgendaItem {
+  id              String       @id @default(cuid())
+  eventId         String
+  speakerId       String?
+  title           String
+  description     String?
+  startTime       DateTime
+  durationMinutes Int
+  status          AgendaStatus @default(UPCOMING)
+  event           Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  speaker         Speaker?     @relation(fields: [speakerId], references: [id])
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+model Script {
+  id          String     @id @default(cuid())
+  eventId     String
+  type        ScriptType
+  content     String
+  durationSec Int?
+  aiGenerated Boolean    @default(true)
+  event       Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdAt   DateTime   @default(now())
+}
+
+model ScheduleChange {
+  id        String   @id @default(cuid())
+  eventId   String
+  reason    String
+  oldStart  DateTime?
+  newStart  DateTime?
+  approved  Boolean  @default(false)
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+enum EventStatus {
+  DRAFT
+  READY
+  LIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum AgendaStatus {
+  UPCOMING
+  READY
+  LIVE
+  COMPLETED
+  DELAYED
+  SKIPPED
+  CANCELLED
+}
+
+enum ScriptType {
+  OPENING
+  INTRODUCTION
+  TRANSITION
+  CLOSING
+  ANNOUNCEMENT
+}
