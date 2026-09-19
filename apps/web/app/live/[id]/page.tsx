@@ -51,7 +51,7 @@ export default function LiveAnchorHUD() {
   const relevantScript = event?.scripts?.find(
     (s) =>
       s.type === (activeIdx === 0 ? "OPENING" : currentItem?.speakerId ? "INTRODUCTION" : "TRANSITION")
-  )?.content || `"Welcome everyone. We are currently live with: ${currentItem?.title || "Session"}. Deliver with passion and confidence."`;
+  )?.content || `"Welcome everyone. We are currently live with: ${currentItem?.title || "Session"}. Deliver with clarity and observe scheduled timings."`;
 
   const handleNext = async () => {
     if (!event || activeIdx >= event.agendaItems.length - 1) return;
@@ -78,84 +78,85 @@ export default function LiveAnchorHUD() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#030712",
-      color: "#f9fafb",
+      background: "#f8fafc",
+      color: "#0f172a",
       padding: "20px 24px 60px",
       display: "flex",
       flexDirection: "column",
-      justifyContent: "space-between"
+      justifyContent: "space-between",
+      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
     }}>
       {/* Top Banner Alert */}
       {bannerAlert && (
         <div style={{
-          background: "#dc2626",
-          color: "white",
-          padding: "16px 24px",
-          borderRadius: 12,
-          fontSize: 20,
-          fontWeight: 800,
+          background: "#fee2e2",
+          border: "1px solid #fecaca",
+          color: "#991b1b",
+          padding: "12px 20px",
+          borderRadius: 8,
+          fontSize: 16,
+          fontWeight: 700,
           textAlign: "center",
-          marginBottom: 16,
-          boxShadow: "0 0 20px rgba(220, 38, 38, 0.6)",
-          animation: "pulse-dot 1.5s infinite"
+          marginBottom: 16
         }}>
-          ⚡ LIVE URGENT: {bannerAlert}
+          📢 URGENT NOTICE: {bannerAlert}
         </div>
       )}
 
       {/* Top Stage Bar */}
       <div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, borderBottom: "1px solid #1f2937", paddingBottom: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <Link href="/" style={{ color: "#9ca3af", textDecoration: "none", fontSize: 13, background: "#111827", padding: "6px 12px", borderRadius: 6 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, borderBottom: "1px solid #e2e8f0", paddingBottom: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <Link href="/" style={{ color: "#475569", textDecoration: "none", fontSize: 13, background: "#ffffff", border: "1px solid #e2e8f0", padding: "6px 12px", borderRadius: 6, fontWeight: 600 }}>
               ← Exit to Dashboard
             </Link>
             <span style={{
-              background: "#ef4444", color: "white", padding: "4px 12px", borderRadius: 999,
-              fontSize: 12, fontWeight: 800, letterSpacing: "0.08em"
+              background: "#fee2e2", color: "#991b1b", border: "1px solid #fecaca", padding: "3px 10px", borderRadius: 999,
+              fontSize: 11, fontWeight: 700, letterSpacing: "0.04em"
             }}>
-              ● ON STAGE LIVE
+              ● LIVE STAGE
             </span>
-            <span style={{ fontSize: 15, fontWeight: 700, color: "#e5e7eb" }}>
+            <span style={{ fontSize: 15, fontWeight: 700, color: "#1e293b" }}>
               {event?.name}
             </span>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ fontSize: 12, color: "#6b7280" }}>Prompter Text Size:</span>
-            <button onClick={() => setFontSize((f) => Math.max(16, f - 2))} style={{ background: "#1f2937", color: "white", padding: "4px 10px", borderRadius: 4, fontWeight: 700 }}>A-</button>
-            <button onClick={() => setFontSize((f) => Math.min(36, f + 2))} style={{ background: "#1f2937", color: "white", padding: "4px 10px", borderRadius: 4, fontWeight: 700 }}>A+</button>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 12, color: "#64748b" }}>Text Size:</span>
+            <button onClick={() => setFontSize((f) => Math.max(16, f - 2))} style={{ background: "#ffffff", border: "1px solid #e2e8f0", color: "#0f172a", padding: "3px 9px", borderRadius: 4, fontWeight: 700 }}>A-</button>
+            <button onClick={() => setFontSize((f) => Math.min(36, f + 2))} style={{ background: "#ffffff", border: "1px solid #e2e8f0", color: "#0f172a", padding: "3px 9px", borderRadius: 4, fontWeight: 700 }}>A+</button>
           </div>
         </div>
 
-        {/* Big HUD Header */}
+        {/* Live Session Status Box */}
         <div style={{
           display: "grid",
           gridTemplateColumns: "2fr 1fr",
-          gap: 20,
-          background: "#111827",
-          padding: 24,
-          borderRadius: 16,
-          border: "2px solid #374151",
-          marginBottom: 24
+          gap: 16,
+          background: "#ffffff",
+          padding: 20,
+          borderRadius: 10,
+          border: "1px solid #e2e8f0",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+          marginBottom: 18
         }}>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#ef4444", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#dc2626", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>
               Current Activity #{activeIdx + 1} of {event?.agendaItems.length || 0}
             </div>
-            <h1 style={{ fontSize: 32, fontWeight: 900, lineHeight: 1.2, margin: 0 }}>
+            <h1 style={{ fontSize: 26, fontWeight: 800, lineHeight: 1.2, color: "#0f172a", margin: 0 }}>
               {currentItem?.title || "Stage Preparation"}
             </h1>
-            <p style={{ color: "#9ca3af", fontSize: 15, marginTop: 6 }}>
+            <p style={{ color: "#64748b", fontSize: 14, marginTop: 4 }}>
               {currentItem?.description || "Ongoing scheduled segment"}
             </p>
 
             {currentItem?.speaker && (
-              <div style={{ marginTop: 12, display: "inline-flex", alignItems: "center", gap: 10, background: "#1e1b4b", padding: "6px 14px", borderRadius: 8, border: "1px solid #4338ca" }}>
-                <span style={{ fontSize: 16 }}>🎤</span>
+              <div style={{ marginTop: 10, display: "inline-flex", alignItems: "center", gap: 8, background: "#eff6ff", border: "1px solid #dbeafe", padding: "5px 12px", borderRadius: 6 }}>
+                <span style={{ fontSize: 14 }}>🎤</span>
                 <div>
-                  <span style={{ fontWeight: 800, color: "#c7d2fe", fontSize: 14 }}>{currentItem.speaker.name}</span>
-                  <span style={{ color: "#818cf8", fontSize: 12 }}> • {currentItem.speaker.designation}</span>
+                  <span style={{ fontWeight: 700, color: "#1e40af", fontSize: 13 }}>{currentItem.speaker.name}</span>
+                  <span style={{ color: "#3b82f6", fontSize: 12 }}> • {currentItem.speaker.designation}</span>
                 </div>
               </div>
             )}
@@ -163,35 +164,35 @@ export default function LiveAnchorHUD() {
 
           <div style={{
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-            background: "#030712", borderRadius: 12, border: "1px solid #1f2937", padding: 16
+            background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0", padding: 12
           }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase" }}>Time Remaining</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>Time Remaining</div>
             <div style={{
-              fontSize: 54, fontWeight: 900, fontFamily: "monospace",
-              color: secondsLeft < 180 ? "#ef4444" : "#10b981",
+              fontSize: 48, fontWeight: 900, fontFamily: "monospace",
+              color: secondsLeft < 180 ? "#dc2626" : "#059669",
               letterSpacing: "-0.04em"
             }}>
               {formatClock(secondsLeft)}
             </div>
-            <div style={{ fontSize: 11, color: "#6b7280" }}>Planned: {currentItem?.durationMinutes || 20}m</div>
+            <div style={{ fontSize: 11, color: "#94a3b8" }}>Allocated: {currentItem?.durationMinutes || 20}m</div>
           </div>
         </div>
 
         {/* Teleprompter Speech Box */}
         <div style={{
-          background: "#090d16",
-          border: "1px solid #1f2937",
-          borderRadius: 16,
-          padding: 32,
-          boxShadow: "inset 0 2px 8px rgba(0,0,0,0.6)"
+          background: "#ffffff",
+          border: "1px solid #cbd5e1",
+          borderRadius: 10,
+          padding: 24,
+          boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
         }}>
-          <div style={{ fontSize: 12, fontWeight: 800, color: "#60a5fa", letterSpacing: "0.08em", marginBottom: 16 }}>
-            📜 LIVE TELEPROMPTER / ANCHOR CUE CARD
+          <div style={{ fontSize: 11, fontWeight: 800, color: "#2563eb", letterSpacing: "0.06em", marginBottom: 12 }}>
+            TELEPROMPTER / ANCHOR NOTES
           </div>
           <div style={{
             fontSize: `${fontSize}px`,
-            lineHeight: 1.8,
-            color: "#f3f4f6",
+            lineHeight: 1.75,
+            color: "#1e293b",
             fontFamily: "Georgia, serif",
             whiteSpace: "pre-wrap"
           }}>
@@ -200,24 +201,25 @@ export default function LiveAnchorHUD() {
         </div>
       </div>
 
-      {/* Bottom Footer Control */}
+      {/* Footer Navigation Controls */}
       <div style={{
-        marginTop: 24,
-        background: "#111827",
-        borderRadius: 14,
-        padding: "16px 24px",
+        marginTop: 20,
+        background: "#ffffff",
+        borderRadius: 10,
+        padding: "14px 20px",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        border: "1px solid #1f2937"
+        border: "1px solid #e2e8f0",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <button
             onClick={handlePrev}
             disabled={activeIdx === 0}
             style={{
-              background: "#1f2937", color: "white", padding: "10px 18px", borderRadius: 8,
-              fontWeight: 700, opacity: activeIdx === 0 ? 0.4 : 1
+              background: "#ffffff", color: "#334155", border: "1px solid #cbd5e1", padding: "8px 16px", borderRadius: 6,
+              fontWeight: 600, fontSize: 13, opacity: activeIdx === 0 ? 0.4 : 1, cursor: activeIdx === 0 ? "not-allowed" : "pointer"
             }}
           >
             ← Previous Activity
@@ -226,8 +228,8 @@ export default function LiveAnchorHUD() {
             onClick={handleNext}
             disabled={!nextItem}
             style={{
-              background: "#6366f1", color: "white", padding: "10px 20px", borderRadius: 8,
-              fontWeight: 800, boxShadow: "0 2px 10px rgba(99, 102, 241, 0.4)"
+              background: "#2563eb", color: "#ffffff", padding: "8px 18px", borderRadius: 6,
+              fontWeight: 600, fontSize: 13, cursor: !nextItem ? "not-allowed" : "pointer"
             }}
           >
             Advance to Next Activity →
@@ -236,9 +238,9 @@ export default function LiveAnchorHUD() {
 
         {nextItem && (
           <div style={{ textAlign: "right" }}>
-            <span style={{ fontSize: 11, color: "#9ca3af", textTransform: "uppercase" }}>Up Next: </span>
-            <span style={{ fontSize: 14, fontWeight: 700, color: "#e5e7eb" }}>{nextItem.title}</span>
-            <span style={{ fontSize: 12, color: "#6b7280" }}> ({nextItem.durationMinutes}m)</span>
+            <span style={{ fontSize: 11, color: "#64748b", textTransform: "uppercase" }}>Up Next: </span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{nextItem.title}</span>
+            <span style={{ fontSize: 12, color: "#64748b" }}> ({nextItem.durationMinutes}m)</span>
           </div>
         )}
       </div>
