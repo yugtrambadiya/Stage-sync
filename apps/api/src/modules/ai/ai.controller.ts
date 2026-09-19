@@ -1,12 +1,17 @@
-import { Body, Controller, Post } from "@nestjs/common";
-import { AiService } from "./ai.service";
+import { Controller, Post, Body } from '@nestjs/common';
+import { AiService } from './ai.service';
 
-@Controller("ai")
+class GenerateScriptDto {
+  type!: 'OPENING' | 'INTRODUCTION' | 'TRANSITION' | 'CLOSING' | 'ANNOUNCEMENT';
+  context!: Record<string, unknown>;
+}
+
+@Controller('ai')
 export class AiController {
   constructor(private readonly aiService: AiService) {}
 
-  @Post("transition")
-  transition(@Body() body: { current: string; next: string; delayMinutes?: number }) {
-    return this.aiService.generateTransition(body);
+  @Post('generate-script')
+  generate(@Body() dto: GenerateScriptDto) {
+    return this.aiService.generateScript(dto);
   }
 }
