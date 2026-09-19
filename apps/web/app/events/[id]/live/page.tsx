@@ -565,57 +565,84 @@ export default function LiveDashboardPage() {
       {/* Announce Modal */}
       {announceModalOpen && (
         <div className="modal-backdrop" onClick={() => setAnnounceModalOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 460 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
-              <h3 style={{ margin: 0, fontSize: 'var(--text-base)' }}>Broadcast Announcement</h3>
-              <button className="btn btn--ghost btn--sm" onClick={() => setAnnounceModalOpen(false)}>✕</button>
+          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 520 }}>
+            <div className="modal__header">
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '18px' }}>📣</span>
+                  <h3 className="modal__title">Broadcast Announcement</h3>
+                </div>
+                <p className="modal__desc">
+                  Push an instant visual banner to all stage monitors, control room, and connected hosts.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="modal__close"
+                onClick={() => setAnnounceModalOpen(false)}
+                title="Close"
+              >
+                ✕
+              </button>
             </div>
 
-            <form onSubmit={handleSendAnnouncement} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-              <div>
-                <label className="label">Announcement Title</label>
-                <input
-                  className="input"
-                  placeholder="e.g. Schedule Update / Break Extended"
-                  value={announceTitle}
-                  onChange={(e) => setAnnounceTitle(e.target.value)}
-                  autoFocus
-                  required
-                />
+            <form onSubmit={handleSendAnnouncement} style={{ display: 'flex', flexDirection: 'column', flex: 1, margin: 0 }}>
+              <div className="modal__body" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                <div>
+                  <label className="label">Announcement Title</label>
+                  <input
+                    className="input"
+                    placeholder="e.g. Break Extended / Keynote in 5 Minutes"
+                    value={announceTitle}
+                    onChange={(e) => setAnnounceTitle(e.target.value)}
+                    autoFocus
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="label">Message Details (Optional)</label>
+                  <textarea
+                    className="input"
+                    placeholder="Provide additional details or action instructions for stage staff..."
+                    rows={3}
+                    value={announceMsg}
+                    onChange={(e) => setAnnounceMsg(e.target.value)}
+                    style={{ resize: 'vertical' }}
+                  />
+                </div>
+
+                <div>
+                  <label className="label">Severity Level</label>
+                  <select
+                    className="select"
+                    value={announceSeverity}
+                    onChange={(e) => setAnnounceSeverity(e.target.value as 'info' | 'warn' | 'success' | 'danger')}
+                  >
+                    <option value="info">ℹ️ Info — Standard announcement</option>
+                    <option value="warn">⚠️ Warning — Schedule drift / caution</option>
+                    <option value="success">✅ Success — Program milestone / all clear</option>
+                    <option value="danger">🚨 Critical — Urgent stage alert</option>
+                  </select>
+                </div>
               </div>
 
-              <div>
-                <label className="label">Message (Optional)</label>
-                <textarea
-                  className="input"
-                  placeholder="Details for the broadcast room..."
-                  rows={3}
-                  value={announceMsg}
-                  onChange={(e) => setAnnounceMsg(e.target.value)}
-                  style={{ resize: 'vertical' }}
-                />
-              </div>
-
-              <div>
-                <label className="label">Severity</label>
-                <select
-                  className="select"
-                  value={announceSeverity}
-                  onChange={(e) => setAnnounceSeverity(e.target.value as 'info' | 'warn' | 'success' | 'danger')}
+              <div className="modal__footer">
+                <button
+                  type="button"
+                  className="btn btn--ghost btn--sm"
+                  onClick={() => setAnnounceModalOpen(false)}
+                  style={{ padding: '8px 16px' }}
                 >
-                  <option value="info">Info</option>
-                  <option value="warn">Warning (Amber)</option>
-                  <option value="success">Success (Green)</option>
-                  <option value="danger">Critical (Red)</option>
-                </select>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}>
-                <button type="button" className="btn btn--ghost btn--sm" onClick={() => setAnnounceModalOpen(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="btn btn--primary btn--sm">
-                  Send Broadcast Toast
+                <button
+                  type="submit"
+                  className="btn btn--primary btn--sm"
+                  style={{ padding: '8px 18px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <span>📣</span>
+                  <span>Send Broadcast Toast</span>
                 </button>
               </div>
             </form>
@@ -626,33 +653,81 @@ export default function LiveDashboardPage() {
       {/* Keyboard Shortcuts Dialog */}
       {shortcutsOpen && (
         <div className="modal-backdrop" onClick={() => setShortcutsOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 380 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
-              <h3 style={{ margin: 0, fontSize: 'var(--text-base)' }}>Keyboard Shortcuts</h3>
-              <button className="btn btn--ghost btn--sm" onClick={() => setShortcutsOpen(false)}>✕</button>
+          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 460 }}>
+            <div className="modal__header">
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '18px' }}>⌨️</span>
+                  <h3 className="modal__title">Keyboard Shortcuts</h3>
+                </div>
+                <p className="modal__desc">
+                  Director hotkeys for fast hands-on-keyboard stage execution.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="modal__close"
+                onClick={() => setShortcutsOpen(false)}
+                title="Close"
+              >
+                ✕
+              </button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', fontSize: 'var(--text-sm)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span>Generate Transition Script</span>
-                <span className="kbd">G</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span>Mark Delay on Current Session</span>
-                <span className="kbd">D</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span>Broadcast Announcement</span>
-                <span className="kbd">A</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span>Close Active Modal</span>
-                <span className="kbd">Esc</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span>Show / Hide Shortcuts</span>
-                <span className="kbd">?</span>
-              </div>
+            <div className="modal__body" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+              {[
+                { label: 'Generate AI Transition Script', key: 'G', desc: 'Draft bridge speech or recovery line' },
+                { label: 'Mark Delay on Active Session', key: 'D', desc: 'Trigger cascading agenda recalculation' },
+                { label: 'Broadcast Stage Announcement', key: 'A', desc: 'Push room-wide notification banner' },
+                { label: 'Close Active Modal', key: 'Esc', desc: 'Dismiss current popup' },
+                { label: 'Toggle Shortcuts Help', key: '?', desc: 'Show / hide this dialog' },
+              ].map((item, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '10px 12px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    border: '1px solid rgba(255, 255, 255, 0.04)',
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text)' }}>
+                      {item.label}
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                      {item.desc}
+                    </div>
+                  </div>
+                  <span
+                    className="kbd"
+                    style={{
+                      padding: '4px 9px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      borderColor: 'rgba(255, 255, 255, 0.18)',
+                      color: 'var(--color-text)',
+                    }}
+                  >
+                    {item.key}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="modal__footer">
+              <button
+                type="button"
+                className="btn btn--secondary btn--sm"
+                onClick={() => setShortcutsOpen(false)}
+                style={{ padding: '8px 18px' }}
+              >
+                Got It
+              </button>
             </div>
           </div>
         </div>
