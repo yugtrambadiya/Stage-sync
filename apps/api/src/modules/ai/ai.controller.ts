@@ -1,10 +1,18 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiProperty } from '@nestjs/swagger';
+import { IsString, IsNotEmpty, IsObject, IsIn } from 'class-validator';
 import { AiService } from './ai.service';
 import { GenerateTransitionDto } from './dto/generate-transition.dto';
 
 export class GenerateScriptDto {
+  @ApiProperty({ enum: ['OPENING', 'INTRODUCTION', 'TRANSITION', 'CLOSING', 'ANNOUNCEMENT'] })
+  @IsString()
+  @IsNotEmpty()
+  @IsIn(['OPENING', 'INTRODUCTION', 'TRANSITION', 'CLOSING', 'ANNOUNCEMENT'])
   type!: 'OPENING' | 'INTRODUCTION' | 'TRANSITION' | 'CLOSING' | 'ANNOUNCEMENT';
+
+  @ApiProperty({ type: Object })
+  @IsObject()
   context!: Record<string, unknown>;
 }
 
