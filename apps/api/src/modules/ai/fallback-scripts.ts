@@ -1,12 +1,12 @@
 export const FALLBACK_SCRIPTS: Record<string, string> = {
   OPENING:
-    "Good morning, everyone! Welcome to TechFest 2025. We are thrilled to have you here today for what promises to be an incredible day of learning, innovation, and inspiration. Let's get started!",
+    "A very warm welcome to everyone joining us today! We are deeply honored and delighted to have such a brilliant, passionate gathering of minds under one roof. Thank you for your energy, presence, and commitment to innovation. Prepare for an unforgettable day of shared learning, visionary ideas, and inspiring breakthroughs. Let's begin!",
   INTRODUCTION:
-    "Please join me in welcoming our next speaker to the stage. Their work has been an inspiration to many in our community, and we are truly honored to have them with us today.",
+    "It is an absolute honor to introduce our next distinguished speaker. Their pioneering dedication and extraordinary insights have enriched our entire community. We are immensely grateful for their time and wisdom with us today. Please join me in giving them a warm, enthusiastic round of applause!",
   TRANSITION:
-    "Thank you for that wonderful session. Let's take a brief moment before we welcome our next speaker. Please help yourselves to some refreshments while we prepare.",
+    "What a truly brilliant and inspiring session! Let's give another massive, heartfelt round of applause for sharing such valuable wisdom with us today. We are so fortunate to learn from leaders of this caliber. As we keep this wonderful momentum going, we have another exceptional presentation lined up for you. Thank you for your fantastic attention—let's give a warm welcome to our next presenter!",
   CLOSING:
-    "And that brings us to the end of TechFest 2025. Thank you to all our incredible speakers, our sponsors, the organizing committee, and most importantly — all of you. Have a safe journey home!",
+    "As we bring this remarkable event to a close, words cannot express our deepest gratitude to our brilliant speakers who illuminated our minds, our dedicated sponsors and organizing team who made this vision a reality, and above all, to each and every one of you for being such an attentive, vibrant audience. Thank you for making today extraordinary. Travel safely and keep innovating!",
   ANNOUNCEMENT:
-    "Attention, everyone. We have a brief schedule adjustment. We appreciate your patience and will resume shortly. Please feel free to network and enjoy the refreshments.",
+    "Thank you so much for your warmth, energy, and wonderful cooperation. We have a brief schedule adjustment underway, and our production crew is taking just a few moments to ensure the upcoming segment delivers the best possible experience. We deeply appreciate your gracious patience—please take this moment to connect with fellow attendees, and we will resume shortly!",
 };

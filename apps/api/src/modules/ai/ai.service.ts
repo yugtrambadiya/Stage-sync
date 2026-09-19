@@ -20,13 +20,20 @@ export class AiService {
     next?: string;
     delayMinutes?: number;
   }) {
-    const current = input?.current ?? '';
-    const next = input?.next ?? '';
+    const current = input?.current?.trim() || 'our previous speaker';
+    const next = input?.next?.trim() || 'our upcoming presentation';
     const delay = input?.delayMinutes ?? 0;
+
+    let draft = '';
+    if (delay > 0) {
+      draft = `What an extraordinary and deeply insightful session from ${current}! Let's give them a tremendous, heartfelt round of applause for sharing such brilliance with us today. We are taking a brief ${delay}-minute intermission to let our stage crew prepare the podium for ${next}. Thank you all for your wonderful energy and gracious patience—please enjoy a quick stretch, and we will resume in just a moment!`;
+    } else {
+      draft = `Let's have another massive, warm round of applause for ${current}! We are so grateful for their time, wisdom, and remarkable presentation. Up next, we have the distinct privilege of welcoming ${next} to the stage. Get ready for an exceptional deep dive—please join me in giving them a warm, enthusiastic welcome!`;
+    }
 
     return {
       type: 'TRANSITION',
-      draft: `Thank you for ${current}. We will now move to ${next}.`,
+      draft,
       context: {
         delayMinutes: delay,
       },

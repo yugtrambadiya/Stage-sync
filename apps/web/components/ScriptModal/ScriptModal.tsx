@@ -70,7 +70,9 @@ export function ScriptModal({
         delayMinutes: delayMinutes > 0 ? delayMinutes : undefined,
       });
 
-      const content = res.draft || 'Welcome everyone to the next stage of our event.';
+      const content =
+        res.draft ||
+        `Let's give another massive, warm round of applause for ${currentSpeaker}! We are so grateful for their exceptional wisdom and inspiring presence today. Next up, we are privileged to welcome ${nextSpeaker} to the stage—please join me in giving them an enthusiastic welcome!`;
       const newId = `scr-${Date.now()}`;
       setScriptContent(content);
       setScriptId(newId);

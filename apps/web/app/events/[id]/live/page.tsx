@@ -502,42 +502,6 @@ export default function LiveDashboardPage() {
                 </button>
               </div>
             </div>
-
-            {/* 4. ON-AIR LOG (COLLAPSIBLE / SUMMARY) */}
-            {showLogDrawer && (
-              <div className="panel" style={{ animation: 'toast-in var(--dur-base) var(--ease-out)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
-                  <span className="panel__title" style={{ margin: 0 }}>On-Air Log</span>
-                  <button className="btn btn--ghost btn--sm" onClick={() => setShowLogDrawer(false)}>✕</button>
-                </div>
-                {activityLog.length === 0 ? (
-                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>No recent activity</div>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', maxHeight: '180px', overflowY: 'auto', overscrollBehavior: 'contain' }}>
-                    {activityLog.map((log) => (
-                      <div
-                        key={log.id}
-                        style={{
-                          fontSize: 'var(--text-xs)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 'var(--space-2)',
-                          padding: '3px 0',
-                          borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
-                        }}
-                      >
-                        <span className="num" style={{ color: 'var(--color-text-muted)', fontSize: '10px' }}>
-                          {new Date(log.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                        </span>
-                        <span style={{ color: log.type === 'delay' ? 'var(--color-warn)' : log.type === 'script' ? 'var(--color-accent)' : 'var(--color-text)' }}>
-                          {log.label}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
           </section>
         </div>
       </main>
@@ -727,6 +691,175 @@ export default function LiveDashboardPage() {
                 style={{ padding: '8px 18px' }}
               >
                 Got It
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* On-Air Log Slide-Over Drawer */}
+      {showLogDrawer && (
+        <div
+          className="modal-backdrop"
+          onClick={() => setShowLogDrawer(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(4, 5, 8, 0.65)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            zIndex: 9999,
+            display: 'flex',
+            justifyContent: 'flex-end',
+            padding: 0,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: '440px',
+              height: '100vh',
+              background: 'rgba(14, 18, 28, 0.98)',
+              borderLeft: '1px solid rgba(255, 255, 255, 0.12)',
+              boxShadow: '-16px 0 48px rgba(0, 0, 0, 0.75)',
+              display: 'flex',
+              flexDirection: 'column',
+              animation: 'modal-spring-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            }}
+          >
+            {/* Drawer Header */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: 'var(--space-5) var(--space-6)',
+                borderBottom: '1px solid var(--color-border)',
+                background: 'rgba(255, 255, 255, 0.02)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '20px' }}>📋</span>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-text)' }}>
+                    On-Air Broadcast Log
+                  </h3>
+                  <p style={{ margin: '2px 0 0', fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                    Live audit trail of stage events & announcements
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="modal__close"
+                onClick={() => setShowLogDrawer(false)}
+                title="Close Log"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Log Records List */}
+            <div
+              style={{
+                flex: 1,
+                overflowY: 'auto',
+                padding: 'var(--space-4) var(--space-6)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--space-3)',
+              }}
+            >
+              {activityLog.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: 'var(--space-8) 0', color: 'var(--color-text-muted)', fontSize: 'var(--text-xs)' }}>
+                  No stage activity recorded yet in this session.
+                </div>
+              ) : (
+                activityLog.map((log) => {
+                  const isDelay = log.type === 'delay';
+                  const isScript = log.type === 'script';
+                  const isAnnounce = log.type === 'announce';
+
+                  const badgeColor = isDelay
+                    ? 'var(--color-warn)'
+                    : isScript
+                    ? 'var(--color-accent)'
+                    : isAnnounce
+                    ? 'var(--color-live)'
+                    : 'var(--color-text-muted)';
+
+                  const badgeBg = isDelay
+                    ? 'rgba(245, 158, 11, 0.15)'
+                    : isScript
+                    ? 'rgba(99, 102, 241, 0.15)'
+                    : isAnnounce
+                    ? 'rgba(16, 185, 129, 0.15)'
+                    : 'rgba(255, 255, 255, 0.05)';
+
+                  return (
+                    <div
+                      key={log.id}
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '4px',
+                        padding: '10px 14px',
+                        borderRadius: 'var(--radius-md)',
+                        background: 'rgba(255, 255, 255, 0.03)',
+                        border: '1px solid var(--color-border)',
+                        animation: 'cascade-enter 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            fontWeight: 700,
+                            letterSpacing: '0.06em',
+                            textTransform: 'uppercase',
+                            color: badgeColor,
+                            background: badgeBg,
+                            padding: '2px 7px',
+                            borderRadius: 'var(--radius-pill)',
+                          }}
+                        >
+                          {log.type}
+                        </span>
+                        <span className="num" style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                          {new Date(log.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text)', lineHeight: 1.5, marginTop: '2px' }}>
+                        {log.label}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Footer */}
+            <div
+              style={{
+                padding: 'var(--space-3) var(--space-6)',
+                borderTop: '1px solid var(--color-border)',
+                background: 'rgba(255, 255, 255, 0.02)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                fontSize: '11px',
+                color: 'var(--color-text-muted)',
+              }}
+            >
+              <span>Total Records: {activityLog.length}</span>
+              <button
+                type="button"
+                className="btn btn--ghost btn--sm"
+                onClick={() => setShowLogDrawer(false)}
+                style={{ padding: '4px 12px', fontSize: '11px' }}
+              >
+                Close Drawer
               </button>
             </div>
           </div>
