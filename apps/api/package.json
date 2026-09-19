@@ -17,6 +17,7 @@
     "@nestjs/websockets": "^11.1.6",
     "@nestjs/platform-socket.io": "^11.1.6",
     "@smart-anchor/database": "workspace:*",
+    "dotenv": "^16.6.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },

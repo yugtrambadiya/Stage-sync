@@ -17,20 +17,20 @@ export default function TopHeader({ currentEvent, onResetDemo }: TopHeaderProps)
           <span className="brand-badge">
             <span className="status-dot"></span> Stage Copilot
           </span>
-          <span style={{ fontSize: 12, color: "var(--text-muted)" }}>PostgreSQL • Prisma • AI Workflows</span>
+          <span style={{ fontSize: 12, color: "var(--text-muted)" }}>PostgreSQL &bull; Prisma &bull; AI Workflows</span>
         </div>
         <h1 style={{ fontSize: "24px", fontWeight: 700, color: "var(--text-primary)" }}>
           {currentEvent?.name || "Event Stage Flow"}
         </h1>
         <p style={{ color: "var(--text-secondary)", fontSize: 13, marginTop: 2 }}>
-          ?? {currentEvent?.venue || "Main Auditorium"} • ??? {new Date(currentEvent?.date || Date.now()).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}
+          {currentEvent?.venue || "Main Auditorium"} &bull; {new Date(currentEvent?.date || Date.now()).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}
         </p>
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         {currentEvent && (
           <Link href={`/live/${currentEvent.id}`} target="_blank" className="btn btn-primary" style={{ textDecoration: "none" }}>
-            Launch Anchor HUD ?
+            Launch Anchor HUD &rarr;
           </Link>
         )}
         <button onClick={onResetDemo} className="btn btn-secondary">

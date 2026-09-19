@@ -67,7 +67,7 @@ export default function SpeakersTab({
                 </div>
                 <div>
                   <h3 style={{ fontSize: 15, fontWeight: 700 }}>{sp.name}</h3>
-                  <p style={{ fontSize: 12, color: "#2563eb" }}>{sp.designation} {sp.organization ? `• ${sp.organization}` : ""}</p>
+                  <p style={{ fontSize: 12, color: "#2563eb" }}>{sp.designation} {sp.organization ? `- ${sp.organization}` : ""}</p>
                 </div>
               </div>
               <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.5, marginBottom: 12 }}>

@@ -262,8 +262,8 @@ export default function StageSyncDashboard() {
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
-  const currentItem = currentEvent?.agendaItems[activeItemIndex];
-  const nextItem = currentEvent?.agendaItems[activeItemIndex + 1];
+  const currentItem = currentEvent?.agendaItems?.[activeItemIndex];
+  const nextItem = currentEvent?.agendaItems?.[activeItemIndex + 1];
 
   if (loading) {
     return (

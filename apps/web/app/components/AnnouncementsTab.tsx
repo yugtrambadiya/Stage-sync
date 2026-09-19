@@ -87,7 +87,6 @@ export default function AnnouncementsTab({
               <div style={{ fontSize: 13, lineHeight: 1.6, color: "var(--text-primary)", whiteSpace: "pre-wrap", marginBottom: 12 }}>
                 {recoveryData.anchorSpeech}
               </div>
-
               <div style={{ fontSize: 11, fontWeight: 700, color: "#1d4ed8", marginBottom: 4 }}>
                 AUDIENCE ENGAGEMENT IDEAS:
               </div>
@@ -132,7 +131,7 @@ export default function AnnouncementsTab({
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {currentEvent.changes.slice(0, 4).map((ch) => (
                   <div key={ch.id} style={{ fontSize: 12, background: "#f8fafc", border: "1px solid #e2e8f0", padding: "6px 10px", borderRadius: 6, color: "var(--text-secondary)" }}>
-                    ?? {ch.reason} <span style={{ color: "var(--text-muted)" }}>• {new Date(ch.createdAt).toLocaleTimeString()}</span>
+                    [!] {ch.reason} <span style={{ color: "var(--text-muted)" }}> - {new Date(ch.createdAt).toLocaleTimeString()}</span>
                   </div>
                 ))}
               </div>

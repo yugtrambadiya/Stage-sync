@@ -45,8 +45,8 @@ export default function LiveAnchorHUD() {
     return `${m.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")}`;
   };
 
-  const currentItem = event?.agendaItems[activeIdx];
-  const nextItem = event?.agendaItems[activeIdx + 1];
+  const currentItem = event?.agendaItems?.[activeIdx];
+  const nextItem = event?.agendaItems?.[activeIdx + 1];
 
   const relevantScript = event?.scripts?.find(
     (s) =>
@@ -54,7 +54,7 @@ export default function LiveAnchorHUD() {
   )?.content || `"Welcome everyone. We are currently live with: ${currentItem?.title || "Session"}. Deliver with clarity and observe scheduled timings."`;
 
   const handleNext = async () => {
-    if (!event || activeIdx >= event.agendaItems.length - 1) return;
+    if (!event || !event.agendaItems || activeIdx >= event.agendaItems.length - 1) return;
     if (currentItem) {
       await updateAgendaItem(event.id, currentItem.id, { status: "COMPLETED" });
     }
@@ -67,9 +67,9 @@ export default function LiveAnchorHUD() {
   };
 
   const handlePrev = () => {
-    if (activeIdx > 0) {
+    if (activeIdx > 0 && event?.agendaItems) {
       setActiveIdx((i) => i - 1);
-      if (event?.agendaItems[activeIdx - 1]) {
+      if (event.agendaItems[activeIdx - 1]) {
         setSecondsLeft(event.agendaItems[activeIdx - 1].durationMinutes * 60);
       }
     }

@@ -32,6 +32,9 @@ importers:
       '@smart-anchor/database':
         specifier: workspace:*
         version: link:../../packages/database
+      dotenv:
+        specifier: ^16.6.1
+        version: 16.6.1
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2

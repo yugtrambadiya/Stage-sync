@@ -40,7 +40,7 @@ export default function LiveTab({
             </span>
           </div>
           <div style={{ fontSize: 24, fontWeight: 800, fontFamily: "monospace", color: "#dc2626" }}>
-            ?? {formatTimer(secondsRemaining)}
+            {formatTimer(secondsRemaining)}
           </div>
         </div>
 
@@ -55,7 +55,7 @@ export default function LiveTab({
           <div style={{ background: "#f8fafc", border: "1px solid var(--border-subtle)", padding: 12, borderRadius: 6, marginBottom: 16 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "#2563eb", textTransform: "uppercase" }}>Current Speaker</div>
             <div style={{ fontSize: 15, fontWeight: 700 }}>{currentItem.speaker.name}</div>
-            <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>{currentItem.speaker.designation} • {currentItem.speaker.organization}</div>
+            <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>{currentItem.speaker.designation} - {currentItem.speaker.organization}</div>
           </div>
         )}
 
@@ -75,7 +75,7 @@ export default function LiveTab({
             style={{ background: "#059669", flex: 1 }}
             onClick={onAdvanceItem}
           >
-            Advance to Next Item ?
+            Advance to Next Item
           </button>
           <button
             className="btn btn-warning"
@@ -99,11 +99,11 @@ export default function LiveTab({
               <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>{nextItem.title}</h3>
               <p style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 8 }}>{nextItem.description}</p>
               <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
-                Planned: {new Date(nextItem.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} • Duration: {nextItem.durationMinutes}m
+                Planned: {new Date(nextItem.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - Duration: {nextItem.durationMinutes}m
               </div>
               {nextItem.speaker && (
                 <div style={{ marginTop: 6, fontSize: 12, color: "#1d4ed8", fontWeight: 600 }}>
-                  ?? Speaker: {nextItem.speaker.name}
+                  Speaker: {nextItem.speaker.name}
                 </div>
               )}
             </div>
@@ -121,10 +121,10 @@ export default function LiveTab({
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {[
-              "? Wrap up in 2 minutes",
-              "?? Check microphone audio levels",
-              "?? Speaker has arrived backstage",
-              "? Refreshments ready in foyer"
+              "Wrap up in 2 minutes",
+              "Check microphone audio levels",
+              "Speaker has arrived backstage",
+              "Refreshments ready in foyer"
             ].map((msg, i) => (
               <button
                 key={i}
