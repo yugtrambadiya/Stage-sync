@@ -1,0 +1,77 @@
+### StageSync API HTTP Requests (VSCode REST Client / JetBrains HTTP Client)
+@baseUrl = http://localhost:4000
+@eventId = evt_technova_2025
+@keynoteId = agt_keynote
+
+### 1. Health Check
+GET {{baseUrl}}/health
+
+### 2. Get Consolidated Event State (Simulate Live Time at Keynote)
+GET {{baseUrl}}/events/{{eventId}}/state?at=2025-09-19T04:15:00.000Z
+
+### 3. List All Speakers
+GET {{baseUrl}}/speakers?eventId={{eventId}}
+
+### 4. List Agenda in Chronological Order
+GET {{baseUrl}}/agenda?eventId={{eventId}}
+
+### 5. Preview 15-Minute Cascade Delay (Zero Writes to DB)
+POST {{baseUrl}}/agenda/{{keynoteId}}/delay/preview
+Content-Type: application/json
+
+{
+  "delayMinutes": 15,
+  "cascade": true,
+  "reason": "Dr. Rohan Verma flight delayed from Mumbai"
+}
+
+### 6. Apply 15-Minute Cascade Delay (With Idempotency Key)
+POST {{baseUrl}}/agenda/{{keynoteId}}/delay
+Content-Type: application/json
+Idempotency-Key: demo-keynote-delay-001
+
+{
+  "delayMinutes": 15,
+  "cascade": true,
+  "reason": "Dr. Rohan Verma flight delayed from Mumbai"
+}
+
+### 7. Re-send Same Idempotency Key (Returns Idempotent-Replay: true header)
+POST {{baseUrl}}/agenda/{{keynoteId}}/delay
+Content-Type: application/json
+Idempotency-Key: demo-keynote-delay-001
+
+{
+  "delayMinutes": 15,
+  "cascade": true,
+  "reason": "Dr. Rohan Verma flight delayed from Mumbai"
+}
+
+### 8. View Schedule Change History
+GET {{baseUrl}}/schedule-changes?eventId={{eventId}}
+
+### 9. Get Recovery Options & Slack for AI Prompt [STRETCH]
+GET {{baseUrl}}/agenda/{{keynoteId}}/recovery-options?delayMinutes=15
+
+### 10. Test Overlap Refusal (cascade=false -> 409)
+POST {{baseUrl}}/agenda/{{keynoteId}}/delay
+Content-Type: application/json
+
+{
+  "delayMinutes": 15,
+  "cascade": false,
+  "reason": "Will cause overlap"
+}
+
+### 11. Test Midnight Refusal (delay crosses midnight -> 400)
+POST {{baseUrl}}/agenda/{{keynoteId}}/delay
+Content-Type: application/json
+
+{
+  "delayMinutes": 900,
+  "cascade": true,
+  "reason": "Pushes past midnight"
+}
+
+### 12. Reset Demo State Back to Pristine TechNova Seed
+POST {{baseUrl}}/api/reset
