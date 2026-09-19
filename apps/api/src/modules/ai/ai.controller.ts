@@ -1,12 +1,32 @@
-import { Body, Controller, Post } from "@nestjs/common";
-import { AiService } from "./ai.service";
+import { Body, Controller, Post } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { AiService } from './ai.service';
+import { GenerateTransitionDto } from './dto/generate-transition.dto';
 
-@Controller("ai")
+@ApiTags('AI')
+@Controller('ai')
 export class AiController {
   constructor(private readonly aiService: AiService) {}
 
-  @Post("transition")
-  transition(@Body() body: { current: string; next: string; delayMinutes?: number }) {
+  @Post('transition')
+  @ApiOperation({
+    summary: 'Generate MC stage transition draft',
+    description: 'Generates an AI transition announcement draft between current and next sessions, with optional delay context.',
+  })
+  @ApiBody({ type: GenerateTransitionDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Transition script draft generated successfully',
+    schema: {
+      example: {
+        type: 'TRANSITION',
+        draft: 'Thank you for Keynote: "AI at the Edge". We will now move to Talk: "WebAssembly in Production".',
+        context: { delayMinutes: 10 },
+        requiresApproval: true,
+      },
+    },
+  })
+  transition(@Body() body: GenerateTransitionDto) {
     return this.aiService.generateTransition(body);
   }
 }
