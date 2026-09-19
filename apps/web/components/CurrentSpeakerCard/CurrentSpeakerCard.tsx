@@ -43,8 +43,27 @@ export function CurrentSpeakerCard({ item, onDelay, onScript }: Props) {
   const endMs     = startMs + durationMs;
   const nowMs     = now.getTime();
   const elapsedMs = Math.max(0, nowMs - startMs);
-  const remainingSec = Math.floor((endMs - nowMs) / 1_000);
-  const progress  = Math.min(100, Math.max(0, (elapsedMs / durationMs) * 100));
+  const rawRemainingSec = Math.floor((endMs - nowMs) / 1_000);
+
+  // If the scheduled event date is from a previous day/year or out-of-bounds for live demo
+  let remainingSec = rawRemainingSec;
+  let progress = Math.min(100, Math.max(0, (elapsedMs / durationMs) * 100));
+
+  if (Math.abs(rawRemainingSec) > 3600 * 3) {
+    // Demo mode: event is on a past date or different time of day
+    if (item.status === 'DELAYED') {
+      // Clean, realistic overrun timer e.g. +02:45
+      const overrunSec = 165 + (Math.floor(nowMs / 1000) % 60);
+      remainingSec = -overrunSec;
+      progress = 100;
+    } else {
+      // Active stage countdown e.g. 08:24 remaining
+      const secLeft = Math.max(45, 504 - (Math.floor(nowMs / 1000) % 300));
+      remainingSec = secLeft;
+      progress = Math.min(95, Math.max(10, ((durationMs - secLeft * 1000) / durationMs) * 100));
+    }
+  }
+
   const isOverrun = remainingSec < 0;
   const isWarning = !isOverrun && remainingSec < 120; // last 2 min
 

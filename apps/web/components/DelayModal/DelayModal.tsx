@@ -79,6 +79,23 @@ export function DelayModal({
 
       setResult(res);
 
+      // Immediately apply the shifted start times to local agenda in Window 1
+      if (res.changes && res.changes.length > 0) {
+        const currentAgenda = useStageStore.getState().agenda;
+        const updated = currentAgenda.map((ag) => {
+          const matched = res.changes.find((c) => c.itemId === ag.id);
+          if (matched) {
+            return {
+              ...ag,
+              startTime: matched.newStart,
+              status: ag.id === item.id ? ('DELAYED' as const) : ag.status,
+            };
+          }
+          return ag;
+        });
+        useStageStore.getState().applyAgendaUpdate(updated);
+      }
+
       setLastDiff({
         batchId: res.batchId,
         delayMinutes: res.delayMinutes,
