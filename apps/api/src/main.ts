@@ -36,6 +36,8 @@ async function bootstrap() {
     .addTag('Agenda')
     .addTag('Schedule Changes')
     .addTag('Demo Tools')
+    .addTag('AI')
+    .addTag('Health')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
