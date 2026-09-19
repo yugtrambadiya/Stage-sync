@@ -10,6 +10,15 @@ interface Props {
   onScript: () => void;
 }
 
+function getInitials(name: string): string {
+  if (!name) return 'ST';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+}
+
 function formatSeconds(totalSec: number): string {
   if (totalSec <= 0) {
     const over = Math.abs(totalSec);
@@ -27,37 +36,38 @@ export function CurrentSpeakerCard({ item, onDelay, onScript }: Props) {
 
   if (!item) {
     return (
-      <div className="csc panel">
-        <div className="panel__title">Now on Stage</div>
+      <div className="csc">
+        <div className="csc__header">
+          <span className="panel__title" style={{ margin: 0, padding: 0, border: 'none', background: 'transparent' }}>
+            Stage Broadcast Monitor
+          </span>
+          <span className="badge badge--completed">STANDBY</span>
+        </div>
         <div className="csc__empty">
-          <span className="csc__empty-icon" aria-hidden="true">○</span>
-          <span className="csc__empty-label">Nothing on stage</span>
-          <span className="csc__empty-sub">Session will begin when scheduled</span>
+          <span className="csc__empty-icon" aria-hidden="true">📡</span>
+          <span className="csc__empty-label">Stage is currently idle</span>
+          <span className="csc__empty-sub">Next scheduled session will appear here automatically</span>
         </div>
       </div>
     );
   }
 
-  const startMs   = new Date(item.startTime).getTime();
+  const startMs = new Date(item.startTime).getTime();
   const durationMs = item.durationMinutes * 60_000;
-  const endMs     = startMs + durationMs;
-  const nowMs     = now.getTime();
+  const endMs = startMs + durationMs;
+  const nowMs = now.getTime();
   const elapsedMs = Math.max(0, nowMs - startMs);
   const rawRemainingSec = Math.floor((endMs - nowMs) / 1_000);
 
-  // If the scheduled event date is from a previous day/year or out-of-bounds for live demo
   let remainingSec = rawRemainingSec;
   let progress = Math.min(100, Math.max(0, (elapsedMs / durationMs) * 100));
 
   if (Math.abs(rawRemainingSec) > 3600 * 3) {
-    // Demo mode: event is on a past date or different time of day
     if (item.status === 'DELAYED') {
-      // Clean, realistic overrun timer e.g. +02:45
       const overrunSec = 165 + (Math.floor(nowMs / 1000) % 60);
       remainingSec = -overrunSec;
       progress = 100;
     } else {
-      // Active stage countdown e.g. 08:24 remaining
       const secLeft = Math.max(45, 504 - (Math.floor(nowMs / 1000) % 300));
       remainingSec = secLeft;
       progress = Math.min(95, Math.max(10, ((durationMs - secLeft * 1000) / durationMs) * 100));
@@ -65,61 +75,82 @@ export function CurrentSpeakerCard({ item, onDelay, onScript }: Props) {
   }
 
   const isOverrun = remainingSec < 0;
-  const isWarning = !isOverrun && remainingSec < 120; // last 2 min
+  const isWarning = !isOverrun && remainingSec < 120;
 
   const statusClass =
     item.status === 'DELAYED' ? 'csc--delayed'
-    : item.status === 'LIVE'  ? 'csc--live'
+    : item.status === 'LIVE' ? 'csc--live'
     : 'csc--default';
 
   const timerClass =
-    isOverrun  ? 'csc__timer csc__timer--overrun'
+    isOverrun ? 'csc__timer csc__timer--overrun'
     : isWarning ? 'csc__timer csc__timer--warn'
     : 'csc__timer';
 
+  const speakerName = item.speaker?.name ?? 'Keynote Speaker';
+  const initials = getInitials(speakerName);
+
   return (
-    <div className={`csc panel ${statusClass}`}>
-      <div className="panel__title">
-        Now on Stage
-        {item.status === 'DELAYED' && <span className="badge badge--delayed" style={{ marginLeft: 8 }}>DELAYED</span>}
+    <div className={`csc ${statusClass}`}>
+      <div className="csc__header">
+        <div className="csc__badge-group">
+          <span className="badge badge--live">ON AIR</span>
+          {item.status === 'DELAYED' && <span className="badge badge--delayed">DRIFT DETECTED</span>}
+        </div>
+        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
+          {item.durationMinutes} MIN ALLOTTED
+        </span>
       </div>
 
       <div className="csc__body">
-        <div className="csc__tally" aria-hidden="true" />
-
-        <div className="csc__content">
-          <div className="csc__speaker num">
-            {item.speaker?.name ?? 'Unknown Speaker'}
+        {/* Speaker Profile Header */}
+        <div className="csc__profile">
+          <div className="csc__avatar" title={speakerName}>
+            {initials}
           </div>
-          {item.speaker?.organization && (
-            <div className="csc__org">{item.speaker.organization}</div>
-          )}
-          <div className="csc__title">{item.title}</div>
+          <div className="csc__details">
+            <div className="csc__speaker">{speakerName}</div>
+            {item.speaker?.organization && (
+              <div className="csc__org">{item.speaker.organization}</div>
+            )}
+          </div>
+        </div>
 
-          {/* Countdown */}
-          <div className={timerClass} suppressHydrationWarning aria-label={isOverrun ? 'Session overrun' : 'Time remaining'}>
-            {isOverrun
-              ? `OVERRUN ${formatSeconds(remainingSec)}`
-              : `${formatSeconds(remainingSec)} remaining`}
+        {/* Session Title */}
+        <div className="csc__title">{item.title}</div>
+
+        {/* Live Countdown HUD */}
+        <div className="csc__hud">
+          <div className="csc__hud-top">
+            <span className="csc__hud-label">
+              {isOverrun ? 'Overrun Time' : 'Time Remaining'}
+            </span>
+            <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
+              Total: {item.durationMinutes}m
+            </span>
           </div>
 
-          {/* Progress bar */}
-          <div className="csc__progress" suppressHydrationWarning role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
+          <div className={timerClass} suppressHydrationWarning>
+            {formatSeconds(remainingSec)}
+          </div>
+
+          {/* Progress Bar */}
+          <div className="csc__progress" suppressHydrationWarning>
             <div
               className={`csc__progress-fill ${isWarning || isOverrun ? 'csc__progress-fill--warn' : ''}`}
               style={{ width: `${progress}%` }}
             />
           </div>
+        </div>
 
-          {/* Actions */}
-          <div className="csc__actions">
-            <button className="btn btn--primary btn--sm" onClick={onScript} title="G">
-              Generate Script <span className="kbd">G</span>
-            </button>
-            <button className="btn btn--ghost btn--sm" onClick={onDelay} title="D">
-              Mark Delayed <span className="kbd">D</span>
-            </button>
-          </div>
+        {/* Actions */}
+        <div className="csc__actions">
+          <button className="btn btn--primary" onClick={onScript} title="Generate AI transition announcement">
+            ✨ Generate Script
+          </button>
+          <button className="btn btn--ghost" onClick={onDelay} title="Introduce a timing delay and cascade downstream">
+            ⏱ Adjust Time
+          </button>
         </div>
       </div>
     </div>
