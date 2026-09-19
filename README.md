@@ -1,4 +1,4 @@
-# Smart Anchor — AI Stage Copilot
+# Stage-sync — AI Stage Copilot
 
 AI-powered real-time event control room for anchors and organizers.
 
@@ -12,9 +12,10 @@ AI-powered real-time event control room for anchors and organizers.
 - WebSockets
 - AI structured workflows
 - Docker
+- GitHub Actions
 - pnpm monorepo
 
-## Core modules
+## Core Modules
 
 - Event & agenda management
 - Speaker/guest management
@@ -24,12 +25,12 @@ AI-powered real-time event control room for anchors and organizers.
 - AI closing scripts
 - Live dashboard
 - Dynamic agenda updates
-- Delay/recovery engine
+- AI delay/recovery engine
 - Emergency announcements
 - Event memory / RAG
 - Audit log
 
-## Local setup
+## Local Setup
 
 ```bash
 pnpm install
@@ -38,18 +39,3 @@ cp .env.example .env
 pnpm db:generate
 pnpm db:migrate
 pnpm dev
-```
-
-Web: http://localhost:3000  
-API: http://localhost:4000
-
-## Git workflow
-
-`main` is production and must be protected.
-
-```text
-feature/* -> PR -> develop -> PR -> main
-fix/*     -> PR -> develop -> PR -> main
-```
-
-Never push directly to `main`.
