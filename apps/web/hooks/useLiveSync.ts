@@ -137,7 +137,59 @@ export function useLiveSync(eventId: string | null): LiveSyncState {
       fetchAndSync();
     });
 
+    /* ── Inter-window real-time BroadcastChannel (< 1ms latency) ──────── */
+    let bc: BroadcastChannel | null = null;
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      try {
+        bc = new BroadcastChannel(`stagesync-${eventId}`);
+        bc.onmessage = (e) => {
+          const msg = e.data;
+          if (!msg) return;
+          if (msg.type === 'delay:applied') {
+            if (msg.updatedAgenda) {
+              applyAgendaUpdate(msg.updatedAgenda);
+            }
+            if (msg.diff) {
+              useStageStore.getState().setLastDiff(msg.diff);
+            }
+            pushAnnouncement({
+              severity: 'warn',
+              title: 'Schedule Updated',
+              message: `Applied ${msg.diff?.delayMinutes ?? 15} min delay`,
+            });
+            logActivity({ label: 'Schedule cascade synced from peer window', type: 'delay' });
+          } else if (msg.type === 'announce' && msg.announcement) {
+            pushAnnouncement(msg.announcement);
+          } else if (msg.type === 'sync') {
+            fetchAndSync();
+          }
+        };
+      } catch {
+        // BroadcastChannel unavailable
+      }
+    }
+
+    /* ── Window focus / visibility sync ───────────────────────────────── */
+    const handleVisibility = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        fetchAndSync();
+      }
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', fetchAndSync);
+      document.addEventListener('visibilitychange', handleVisibility);
+    }
+
+    /* ── Heartbeat sync (catches any server changes every 2.5s) ───────── */
+    const heartbeat = setInterval(fetchAndSync, 2_500);
+
     return () => {
+      clearInterval(heartbeat);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('focus', fetchAndSync);
+        document.removeEventListener('visibilitychange', handleVisibility);
+      }
+      if (bc) bc.close();
       socket.off();
       socket.disconnect();
       socketRef.current = null;

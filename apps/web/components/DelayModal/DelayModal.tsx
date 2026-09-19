@@ -80,9 +80,10 @@ export function DelayModal({
       setResult(res);
 
       // Immediately apply the shifted start times to local agenda in Window 1
+      let updated = useStageStore.getState().agenda;
       if (res.changes && res.changes.length > 0) {
         const currentAgenda = useStageStore.getState().agenda;
-        const updated = currentAgenda.map((ag) => {
+        updated = currentAgenda.map((ag) => {
           const matched = res.changes.find((c) => c.itemId === ag.id);
           if (matched) {
             return {
@@ -96,13 +97,30 @@ export function DelayModal({
         useStageStore.getState().applyAgendaUpdate(updated);
       }
 
-      setLastDiff({
+      const diffObj = {
         batchId: res.batchId,
         delayMinutes: res.delayMinutes,
         changes: res.changes,
         impact: res.impact,
         appliedAt: new Date().toISOString(),
-      });
+      };
+
+      setLastDiff(diffObj);
+
+      // Broadcast to other windows / tabs immediately (< 1ms latency)
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        try {
+          const bc = new BroadcastChannel(`stagesync-${item.eventId}`);
+          bc.postMessage({
+            type: 'delay:applied',
+            updatedAgenda: updated,
+            diff: diffObj,
+          });
+          bc.close();
+        } catch {
+          // ignore
+        }
+      }
 
       logActivity({
         label: `Applied +${minutes}m delay to "${item.title}" (${res.impact.affectedCount} items shifted)`,
