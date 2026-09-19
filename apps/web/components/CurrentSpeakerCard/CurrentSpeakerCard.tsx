@@ -97,14 +97,14 @@ export function CurrentSpeakerCard({ item, onDelay, onScript }: Props) {
           <div className="csc__title">{item.title}</div>
 
           {/* Countdown */}
-          <div className={timerClass} aria-label={isOverrun ? 'Session overrun' : 'Time remaining'}>
+          <div className={timerClass} suppressHydrationWarning aria-label={isOverrun ? 'Session overrun' : 'Time remaining'}>
             {isOverrun
               ? `OVERRUN ${formatSeconds(remainingSec)}`
               : `${formatSeconds(remainingSec)} remaining`}
           </div>
 
           {/* Progress bar */}
-          <div className="csc__progress" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
+          <div className="csc__progress" suppressHydrationWarning role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
             <div
               className={`csc__progress-fill ${isWarning || isOverrun ? 'csc__progress-fill--warn' : ''}`}
               style={{ width: `${progress}%` }}

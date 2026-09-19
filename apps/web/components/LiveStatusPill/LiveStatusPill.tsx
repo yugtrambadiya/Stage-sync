@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import type { ConnectionStatus } from '../../lib/types';
 
 interface Props {
@@ -9,12 +10,15 @@ interface Props {
 
 /** Shows ● LIVE (green pulse) or ◌ RECONNECTING... (amber) */
 export function LiveStatusPill({ status, lastSyncedAt }: Props) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const isLive = status === 'connected';
   const isRecon = status === 'reconnecting';
 
   // Compute "synced N s ago"
   let syncLabel = '';
-  if (lastSyncedAt && isLive) {
+  if (mounted && lastSyncedAt && isLive) {
     const diffSec = Math.floor((Date.now() - new Date(lastSyncedAt).getTime()) / 1_000);
     syncLabel = diffSec < 5 ? 'Synced just now' : `Synced ${diffSec}s ago`;
   }
@@ -29,7 +33,7 @@ export function LiveStatusPill({ status, lastSyncedAt }: Props) {
         {isLive ? '● LIVE' : isRecon ? '◌ RECONNECTING...' : '○ OFFLINE'}
       </span>
       {syncLabel && (
-        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
+        <span suppressHydrationWarning style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
           {syncLabel}
         </span>
       )}

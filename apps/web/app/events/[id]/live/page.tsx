@@ -60,6 +60,11 @@ export default function LiveDashboardPage() {
 
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [showLogDrawer, setShowLogDrawer] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Initial load
   const loadState = useCallback(async () => {
@@ -203,6 +208,7 @@ export default function LiveDashboardPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
           <div
             className="num"
+            suppressHydrationWarning
             style={{
               fontFamily: 'var(--font-mono)',
               fontSize: 'var(--text-base)',
@@ -215,7 +221,7 @@ export default function LiveDashboardPage() {
             }}
             title="Wall clock"
           >
-            {formatClock(now)}
+            {mounted ? formatClock(now) : '--:--:--'}
           </div>
 
           {/* Drift chip */}
