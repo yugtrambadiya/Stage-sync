@@ -3,6 +3,11 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { AiService } from './ai.service';
 import { GenerateTransitionDto } from './dto/generate-transition.dto';
 
+export class GenerateScriptDto {
+  type!: 'OPENING' | 'INTRODUCTION' | 'TRANSITION' | 'CLOSING' | 'ANNOUNCEMENT';
+  context!: Record<string, unknown>;
+}
+
 @ApiTags('AI')
 @Controller('ai')
 export class AiController {
@@ -28,5 +33,14 @@ export class AiController {
   })
   transition(@Body() body: GenerateTransitionDto) {
     return this.aiService.generateTransition(body);
+  }
+
+  @Post('generate-script')
+  @ApiOperation({
+    summary: 'Generate AI script with Gemini/OpenAI and fallback',
+    description: 'Generates MC scripts for opening, speaker introductions, delay transitions, or announcements.',
+  })
+  generate(@Body() dto: GenerateScriptDto) {
+    return this.aiService.generateScript(dto);
   }
 }

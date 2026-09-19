@@ -1,4 +1,6 @@
 import { Module, MiddlewareConsumer } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { join } from 'path';
 import { HealthController } from './health.controller';
 import { EventsModule } from './modules/events/events.module';
 import { SpeakersModule } from './modules/speakers/speakers.module';
@@ -13,6 +15,10 @@ import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: [join(process.cwd(), '..', '..', '.env'), join(process.cwd(), '.env'), '.env'],
+    }),
     // Global infrastructure
     PrismaModule,
     ScheduleEventsModule,
@@ -22,7 +28,6 @@ import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
     AgendaModule,
     ScheduleChangesModule,
     RecoveryModule,
-    // Teammate 2's modules (unchanged stubs)
     LiveModule,
     AiModule,
   ],
