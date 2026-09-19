@@ -150,21 +150,31 @@ export function DelayModal({
       <div className="delay-modal" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="delay-modal__header">
-          <h3 className="delay-modal__title">
-            {result ? 'Schedule Updated' : 'Mark Stage Delay'}
-          </h3>
-          <button className="btn btn--ghost btn--sm" onClick={onClose} aria-label="Close">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '18px' }}>⏱️</span>
+            <div>
+              <h3 className="delay-modal__title">
+                {result ? 'Schedule Updated' : 'Mark Stage Delay'}
+              </h3>
+            </div>
+          </div>
+          <button className="modal__close" onClick={onClose} aria-label="Close" title="Close">
             ✕
           </button>
         </div>
 
         {/* Body */}
         <div className="delay-modal__body">
-          {/* Target session info */}
+          {/* Target session info with crisp symmetrical edges */}
           <div className="delay-modal__item-info">
-            <div className="delay-modal__item-title">{item.title}</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+              <span className="delay-modal__item-title">{item.title}</span>
+              <span className="badge badge--delayed" style={{ fontSize: '10px', padding: '1px 6px' }}>
+                Target Session
+              </span>
+            </div>
             <div className="delay-modal__item-speaker">
-              {item.speaker?.name ?? 'Speaker'} · Scheduled: {formatTime(item.startTime)} ({item.durationMinutes}m)
+              👤 {item.speaker?.name ?? 'Speaker'} · 🕒 Scheduled: {formatTime(item.startTime)} ({item.durationMinutes}m)
             </div>
           </div>
 

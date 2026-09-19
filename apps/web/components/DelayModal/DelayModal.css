@@ -3,63 +3,84 @@
 .delay-modal {
   width: 90%;
   max-width: 540px;
-  background: var(--color-surface);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--color-border);
+  background: rgba(16, 20, 30, 0.96);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-modal);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: toast-in var(--dur-base) var(--ease-out);
+  animation: modal-spring-in 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .delay-modal__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-4) var(--space-6);
+  padding: var(--space-5) var(--space-6);
   border-bottom: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .delay-modal__title {
   margin: 0;
   font-size: var(--text-base);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-text);
+  letter-spacing: -0.01em;
 }
 
 .delay-modal__body {
   padding: var(--space-6);
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-5);
 }
 
+/* Symmetrical card with clean straight edges on both sides */
 .delay-modal__item-info {
-  background: var(--color-surface-2);
-  padding: var(--space-3) var(--space-4);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  border-left: 3px solid var(--color-accent);
+  padding: 14px 16px 14px 20px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all var(--dur-fast);
+}
+
+.delay-modal__item-info::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--color-accent) 0%, #818cf8 100%);
+  border-radius: 4px 0 0 4px;
 }
 
 .delay-modal__item-title {
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-text);
   font-size: var(--text-sm);
+  letter-spacing: -0.01em;
 }
 
 .delay-modal__item-speaker {
   font-size: var(--text-xs);
   color: var(--color-text-muted);
-  margin-top: 2px;
+  line-height: 1.4;
 }
 
 .delay-modal__field {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
 }
 
 .delay-modal__presets {
@@ -68,31 +89,35 @@
 }
 
 .delay-modal__preset-btn {
-  background: var(--color-surface-2);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--color-border);
   color: var(--color-text-muted);
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  padding: 4px 10px;
-  border-radius: var(--radius-sm);
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
   cursor: pointer;
-  transition: all var(--dur-fast);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .delay-modal__preset-btn:hover {
   color: var(--color-text);
-  border-color: var(--color-accent);
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
 }
 
 .delay-modal__preset-btn--active {
   background: var(--color-accent-glow);
   border-color: var(--color-accent);
   color: var(--color-accent);
+  box-shadow: 0 0 12px var(--color-accent-glow);
 }
 
 /* Inline Diff */
 .delay-modal__diff {
-  background: var(--color-surface-2);
+  background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: var(--space-4);
@@ -173,5 +198,6 @@
   gap: var(--space-3);
   padding: var(--space-4) var(--space-6);
   border-top: 1px solid var(--color-border);
-  background: var(--color-surface-2);
+  background: rgba(255, 255, 255, 0.02);
 }
+

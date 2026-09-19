@@ -51,6 +51,14 @@ export function useLiveSync(eventId: string | null): LiveSyncState {
 
     socketRef.current = socket;
 
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+    function debouncedFetch(delayMs = 120) {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        fetchAndSync();
+      }, delayMs);
+    }
+
     /* ── REST fallback — fetch state when socket connect or reconnects ── */
     async function fetchAndSync() {
       try {
@@ -61,10 +69,21 @@ export function useLiveSync(eventId: string | null): LiveSyncState {
       }
     }
 
+    /* ── Adaptive Heartbeat (minimizes server load while connected) ──── */
+    let heartbeat: ReturnType<typeof setInterval>;
+    const updateHeartbeatRate = () => {
+      clearInterval(heartbeat);
+      // Fast polling (3s) only when disconnected/reconnecting; relaxed (12s) when WebSocket is streaming
+      const intervalMs = socket.connected ? 12_000 : 3_000;
+      heartbeat = setInterval(fetchAndSync, intervalMs);
+    };
+    updateHeartbeatRate();
+
     /* ── Socket event handlers ─────────────────────────────────────────── */
 
     socket.on('connect', () => {
       setConnection('connected');
+      updateHeartbeatRate();
       // Join the event room
       socket.emit('join', { eventId });
       logActivity({ label: 'Socket connected', type: 'connection' });
@@ -74,11 +93,13 @@ export function useLiveSync(eventId: string | null): LiveSyncState {
 
     socket.on('disconnect', () => {
       setConnection('reconnecting');
+      updateHeartbeatRate();
       logActivity({ label: 'Socket disconnected — reconnecting', type: 'connection' });
     });
 
     socket.on('connect_error', () => {
       setConnection('reconnecting');
+      updateHeartbeatRate();
     });
 
     socket.on('reconnect_attempt', () => {
@@ -87,6 +108,7 @@ export function useLiveSync(eventId: string | null): LiveSyncState {
 
     socket.on('reconnect', () => {
       setConnection('connected');
+      updateHeartbeatRate();
       socket.emit('join', { eventId });
       logActivity({ label: 'Socket reconnected', type: 'connection' });
       fetchAndSync();
@@ -105,21 +127,21 @@ export function useLiveSync(eventId: string | null): LiveSyncState {
       applyAgendaUpdate(items);
     });
 
-    // schedule.cascaded / schedule.reverted domain events
+    // schedule.cascaded / schedule.reverted domain events (debounced to absorb bursts)
     socket.on('schedule.cascaded', () => {
       logActivity({ label: 'Schedule cascade applied', type: 'delay' });
-      fetchAndSync();
+      debouncedFetch(100);
     });
 
     socket.on('schedule.reverted', () => {
       logActivity({ label: 'Schedule change reverted', type: 'delay' });
-      fetchAndSync();
+      debouncedFetch(100);
     });
 
     // agenda CRUD events
-    socket.on('agenda.created', () => fetchAndSync());
-    socket.on('agenda.updated', () => fetchAndSync());
-    socket.on('agenda.deleted', () => fetchAndSync());
+    socket.on('agenda.created', () => debouncedFetch(120));
+    socket.on('agenda.updated', () => debouncedFetch(120));
+    socket.on('agenda.deleted', () => debouncedFetch(120));
 
     // Announcements from server
     socket.on('announce:new', (data: { message?: string; title?: string; severity?: string }) => {
@@ -161,7 +183,7 @@ export function useLiveSync(eventId: string | null): LiveSyncState {
           } else if (msg.type === 'announce' && msg.announcement) {
             pushAnnouncement(msg.announcement);
           } else if (msg.type === 'sync') {
-            fetchAndSync();
+            debouncedFetch(100);
           }
         };
       } catch {
@@ -172,21 +194,19 @@ export function useLiveSync(eventId: string | null): LiveSyncState {
     /* ── Window focus / visibility sync ───────────────────────────────── */
     const handleVisibility = () => {
       if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
-        fetchAndSync();
+        debouncedFetch(100);
       }
     };
     if (typeof window !== 'undefined') {
-      window.addEventListener('focus', fetchAndSync);
+      window.addEventListener('focus', () => debouncedFetch(100));
       document.addEventListener('visibilitychange', handleVisibility);
     }
 
-    /* ── Heartbeat sync (catches any server changes every 2.5s) ───────── */
-    const heartbeat = setInterval(fetchAndSync, 2_500);
-
     return () => {
       clearInterval(heartbeat);
+      if (debounceTimer) clearTimeout(debounceTimer);
       if (typeof window !== 'undefined') {
-        window.removeEventListener('focus', fetchAndSync);
+        window.removeEventListener('focus', () => debouncedFetch(100));
         document.removeEventListener('visibilitychange', handleVisibility);
       }
       if (bc) bc.close();
