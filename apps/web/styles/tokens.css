@@ -1,0 +1,91 @@
+/* ─── StageSync Design Tokens ───────────────────────────────────────────────
+   Single source of truth. Never hard-code values outside this file.
+   Status tokens must be the only way to apply status-based colours.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* ── Colour — Base ─────────────────────────────────────────────────────── */
+  --color-bg:         #0a0b0f;
+  --color-surface:    #13151c;
+  --color-surface-2:  #1c1f2b;
+  --color-border:     #2a2d3a;
+
+  /* ── Colour — Accent ───────────────────────────────────────────────────── */
+  --color-accent:       #6366f1;
+  --color-accent-glow:  rgba(99, 102, 241, 0.18);
+
+  /* ── Colour — Signal ───────────────────────────────────────────────────── */
+  --color-live:         #22c55e;
+  --color-live-glow:    rgba(34, 197, 94, 0.2);
+  --color-warn:         #f59e0b;
+  --color-warn-glow:    rgba(245, 158, 11, 0.18);
+  --color-danger:       #ef4444;
+  --color-danger-glow:  rgba(239, 68, 68, 0.18);
+
+  /* ── Colour — Text ─────────────────────────────────────────────────────── */
+  --color-text:         #f1f5f9;
+  --color-text-muted:   #94a3b8;
+  --color-text-faint:   #4b5563;
+
+  /* ── Status tokens ─────────────────────────────────────────────────────── */
+  --status-live-fg:       var(--color-live);
+  --status-live-bg:       var(--color-live-glow);
+  --status-delayed-fg:    var(--color-warn);
+  --status-delayed-bg:    var(--color-warn-glow);
+  --status-completed-fg:  var(--color-text-muted);
+  --status-completed-bg:  transparent;
+  --status-upcoming-fg:   var(--color-accent);
+  --status-upcoming-bg:   var(--color-accent-glow);
+  --status-danger-fg:     var(--color-danger);
+  --status-danger-bg:     var(--color-danger-glow);
+
+  /* ── Font faces ────────────────────────────────────────────────────────── */
+  --font-display: 'Inter', sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
+
+  /* ── Spacing (4px base) ────────────────────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 48px;
+
+  /* ── Border radius ─────────────────────────────────────────────────────── */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-pill: 9999px;
+
+  /* ── Shadows ───────────────────────────────────────────────────────────── */
+  --shadow-card:  0 1px 3px rgba(0,0,0,0.4), 0 0 0 1px var(--color-border);
+  --shadow-modal: 0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px var(--color-border);
+
+  /* ── Motion ────────────────────────────────────────────────────────────── */
+  --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast:      120ms;
+  --dur-base:      200ms;
+  --dur-layout:    300ms;
+
+  /* ── Type scale ────────────────────────────────────────────────────────── */
+  --text-xs:    11px;
+  --text-sm:    13px;
+  --text-base:  15px;
+  --text-md:    16px;
+  --text-lg:    18px;
+  --text-xl:    22px;
+  --text-2xl:   28px;
+  --text-3xl:   40px;
+  --text-timer: clamp(36px, 6vw, 72px);
+
+  /* ── Layout ────────────────────────────────────────────────────────────── */
+  --header-h:    56px;
+  --sidebar-w:   320px;
+
+  /* ── Z-index ───────────────────────────────────────────────────────────── */
+  --z-toast:  9000;
+  --z-modal:  8000;
+  --z-header: 100;
+}

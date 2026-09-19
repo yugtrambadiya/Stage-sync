@@ -1,0 +1,97 @@
+/* ── CurrentSpeakerCard ─────────────────────────────────────────────────── */
+
+.csc { overflow: hidden; }
+
+.csc--live   { border-left: 3px solid var(--status-live-fg); }
+.csc--delayed{ border-left: 3px solid var(--status-delayed-fg); }
+.csc--default{ border-left: 3px solid var(--color-border); }
+
+.csc__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-6);
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.csc__empty-icon  { font-size: 32px; color: var(--color-text-muted); }
+.csc__empty-label { font-size: var(--text-md); font-weight: 600; color: var(--color-text-muted); }
+.csc__empty-sub   { font-size: var(--text-sm); color: var(--color-text-faint); }
+
+.csc__body {
+  display: flex;
+  gap: 0;
+}
+
+/* Tally light stripe */
+.csc__tally {
+  width: 3px;
+  min-height: 100%;
+  background: var(--color-live);
+  flex-shrink: 0;
+  animation: pulse-live 2s ease infinite;
+}
+.csc--delayed .csc__tally { background: var(--color-warn); animation: none; }
+
+.csc__content {
+  flex: 1;
+  padding: var(--space-5) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.csc__speaker {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
+.csc__org {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: -8px;
+}
+
+.csc__title {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+/* Countdown timer */
+.csc__timer {
+  font-family: var(--font-mono);
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 700;
+  color: var(--color-live);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.csc__timer--warn    { color: var(--color-warn); }
+.csc__timer--overrun { color: var(--color-danger); }
+
+/* Progress bar */
+.csc__progress {
+  height: 3px;
+  background: var(--color-surface-2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.csc__progress-fill {
+  height: 100%;
+  background: var(--color-live);
+  border-radius: 2px;
+  transition: width 1s linear;
+}
+.csc__progress-fill--warn { background: var(--color-warn); }
+
+.csc__actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: var(--space-2);
+}
