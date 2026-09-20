@@ -22,6 +22,7 @@ declare global {
         id: {
           initialize: (config: any) => void;
           prompt: () => void;
+          renderButton: (element: HTMLElement, config: any) => void;
         };
       };
     };
