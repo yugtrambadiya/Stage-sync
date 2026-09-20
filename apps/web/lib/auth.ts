@@ -44,7 +44,8 @@ async function authFetch<T>(path: string, body: Record<string, unknown>): Promis
   const data = await res.json();
 
   if (!res.ok) {
-    throw new Error(data.message || 'Authentication failed.');
+    const msg = Array.isArray(data.message) ? data.message.join(', ') : data.message;
+    throw new Error(msg || 'Authentication failed.');
   }
 
   return data as T;

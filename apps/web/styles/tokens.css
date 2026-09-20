@@ -119,3 +119,36 @@
   --z-modal:  8000;
   --z-header: 500;
 }
+
+/* ─── Light Mode Overrides ────────────────────────────────────────────────── */
+[data-theme="light"] {
+  /* ── Colour — Base & Surfaces ───────────────────────────────────────────── */
+  --color-bg:               #f8fafc;
+  --color-bg-subtle:        #f1f5f9;
+  --color-surface:          rgba(255, 255, 255, 0.85);
+  --color-surface-solid:    #ffffff;
+  --color-surface-elevated: rgba(255, 255, 255, 0.95);
+  --color-surface-hover:    rgba(241, 245, 249, 0.94);
+  
+  /* ── Hairline Borders ───────────────────────────────────────────────────── */
+  --color-border:           rgba(0, 0, 0, 0.1);
+  --color-border-subtle:    rgba(0, 0, 0, 0.05);
+  --color-border-hover:     rgba(0, 0, 0, 0.2);
+  --color-border-active:    rgba(99, 102, 241, 0.55);
+
+  /* ── Glass Surfaces ─────────────────────────────────────────────────────── */
+  --surface-glass:          linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.3) 100%), rgba(255, 255, 255, 0.82);
+  --surface-glass-hover:    linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.5) 100%), rgba(255, 255, 255, 0.88);
+  --surface-spotlight:      linear-gradient(180deg, rgba(99, 102, 241, 0.05) 0%, rgba(255, 255, 255, 0.4) 100%), rgba(255, 255, 255, 0.9);
+
+  /* ── Colour — Typography ────────────────────────────────────────────────── */
+  --color-text:             #0f172a;
+  --color-text-secondary:   #334155;
+  --color-text-muted:       #64748b;
+  --color-text-faint:       #94a3b8;
+
+  /* ── Glassmorphism & Shadows ────────────────────────────────────────────── */
+  --shadow-card:            0 8px 30px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 1);
+  --shadow-spotlight:       0 12px 40px rgba(0, 0, 0, 0.1), 0 0 20px -5px rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 1);
+  --shadow-modal:           0 20px 60px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+}

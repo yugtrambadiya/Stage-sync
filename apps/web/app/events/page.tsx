@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { eventsApi } from '../../lib/api';
 import type { Event } from '../../lib/types';
+import AccountMenu from '../../components/AccountMenu';
 
 function formatDate(iso: string): string {
   try {
@@ -91,7 +92,7 @@ export default function EventsPage() {
           </span>
         </div>
 
-        <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
           <button
             className="btn btn--secondary btn--sm"
             onClick={loadEvents}
@@ -100,6 +101,7 @@ export default function EventsPage() {
           >
             ↺ Refresh
           </button>
+          <AccountMenu />
         </div>
       </header>
 

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import './landing.css';
+import AccountMenu from '../components/AccountMenu';
 
 export const metadata: Metadata = {
   title: 'StageSync — Live Stage Coordination. Zero Dead Air.',
@@ -11,6 +12,16 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <main className="landing">
+      {/* ── Header ───────────────────────────────────────────────────────── */}
+      <header className="app-header">
+        <Link href="/" className="app-header__wordmark">
+          STAGE-SYNC
+        </Link>
+        <div className="app-header__actions">
+          <AccountMenu />
+        </div>
+      </header>
+
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section className="landing__hero">
         <div className="container">
