@@ -123,28 +123,6 @@ pnpm test
 
 ---
 
-## 🎬 Judging Demo Walkthrough (5-Minute Script)
-
-1. **The Smooth Show**:
-   - Open [http://localhost:3000/events/evt_technova_2025/live](http://localhost:3000/events/evt_technova_2025/live).
-   - Point out the active keynote on stage, the countdown timer, the next speaker up, and the on-time indicator (`ON TIME`).
-2. **The Crisis (Simulate a Delay)**:
-   - Click **"Mark Delay"** on the keynote session.
-   - Enter `+15 min` with reason *"Speaker travel delay"* and confirm.
-   - Notice how all downstream sessions instantly shift forward by 15 minutes, the drift pill updates to `+15 MIN DRIFT`, and an on-air audit entry is logged.
-3. **Multi-Window Synchronization**:
-   - Open the same URL in a second browser window.
-   - Notice that changes made in one window immediately reflect in the other with sub-millisecond latency over WebSockets.
-4. **The Recovery (AI Stage Copilot)**:
-   - Click **"Generate Script"** on any session transition.
-   - Watch the script generate instantly.
-   - Click **"Read Aloud"** to hear the browser's speech synthesis speak the announcement script.
-5. **Instant Reset**:
-   - Click **"Reset"** in the top navigation bar.
-   - The database restores to the original schedule in `< 1 second`.
-
----
-
 ## 🛡️ Tech Stack
 
 - **Frontend**: Next.js 15 (App Router), React 19, TypeScript, Zustand, Vanilla CSS Design System.
