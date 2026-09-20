@@ -135,36 +135,44 @@
   border: 1px solid var(--color-border);
 }
 
-/* ── HORIZONTAL COMMAND BODY — the key structural change ── */
+/* ── STRUCTURED COMMAND BODY ── */
 .csc__body {
-  padding: 16px 20px 18px;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 0 20px;
-  align-items: center;
+  padding: 16px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   position: relative;
   z-index: 2;
 }
 
-/* Speaker Profile — left column */
-.csc__profile {
+/* ── Upper Deck: Speaker (Left) & Broadcast Timer/Actions (Right) ── */
+.csc__upper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* Speaker Identity Block */
+.csc__speaker-block {
   display: flex;
   align-items: center;
-  gap: 13px;
+  gap: 14px;
   min-width: 0;
+  flex: 1;
 }
 
 .csc__avatar {
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.4) 0%, rgba(139, 92, 246, 0.25) 100%);
   border: 1.5px solid rgba(99, 102, 241, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   color: #e0e7ff;
   box-shadow: 0 0 16px rgba(99, 102, 241, 0.3);
@@ -181,25 +189,25 @@
 
 .csc__avatar-mic {
   position: absolute;
-  bottom: -3px; right: -3px;
-  width: 10px; height: 10px;
+  bottom: -2px; right: -2px;
+  width: 11px; height: 11px;
   border-radius: 50%;
   background: #10b981;
   border: 2px solid #080a14;
   box-shadow: 0 0 6px #10b981;
 }
 
-.csc__details {
+.csc__speaker-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   min-width: 0;
 }
 
-.csc__speaker {
-  font-size: 15px;
+.csc__speaker-name {
+  font-size: 16px;
   font-weight: 700;
-  color: var(--color-text);
+  color: #ffffff;
   letter-spacing: -0.015em;
   white-space: nowrap;
   overflow: hidden;
@@ -207,68 +215,30 @@
   line-height: 1.25;
 }
 
-.csc__org {
-  font-size: 11.5px;
+.csc__speaker-role {
+  font-size: 12px;
   color: var(--color-text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* ── Center Column: Session info ── */
-.csc__center-col {
+/* Broadcast Timer Block */
+.csc__timer-block {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  min-width: 0;
-  padding: 0 4px;
-}
-
-/* Compact title inline */
-.csc__title-inline {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-
-.csc__title-tag {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--color-accent);
-  background: rgba(99, 102, 241, 0.12);
-  padding: 2px 7px;
-  border-radius: var(--radius-pill);
-  border: 1px solid rgba(99, 102, 241, 0.25);
+  align-items: flex-end;
+  gap: 6px;
   flex-shrink: 0;
 }
 
-.csc__title {
-  font-size: 13px;
-  font-weight: 600;
-  color: #e8eaf0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.35;
-}
-
-/* Slim progress HUD */
-.csc__hud-mini {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.csc__hud-top {
+.csc__timer-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
 }
 
-.csc__hud-label {
+.csc__timer-label {
   display: flex;
   align-items: center;
   gap: 5px;
@@ -299,21 +269,172 @@
   animation: subtle-pulse 1s infinite;
 }
 
-.csc__hud-total {
+.csc__timer-total {
   font-family: var(--font-mono);
   font-size: 10px;
   color: var(--color-text-faint);
 }
 
-/* Progress bar */
+/* Big High-Precision Broadcast Timer */
+.csc__timer {
+  font-family: var(--font-mono);
+  font-size: 32px;
+  font-weight: 800;
+  color: #34d399;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 16px rgba(52, 211, 153, 0.4);
+}
+
+.csc__timer--warn {
+  color: #fbbf24;
+  text-shadow: 0 0 16px rgba(251, 191, 36, 0.4);
+}
+
+.csc__timer--overrun {
+  color: #f87171;
+  text-shadow: 0 0 20px rgba(248, 113, 113, 0.5);
+  animation: overrun-flash 2s infinite;
+}
+
+@keyframes overrun-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
+
+/* Inline Action Buttons right under the timer */
+.csc__timer-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 2px;
+}
+
+.csc__action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-weight: 600;
+  font-size: 11.5px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  border: none;
+}
+
+.csc__action-btn--hero {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
+}
+.csc__action-btn--hero:hover {
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.65);
+  transform: translateY(-1px);
+}
+
+.csc__delay-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+.csc__delay-action-btn:hover {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.65);
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.3);
+  transform: translateY(-1px);
+  color: #fff;
+}
+.csc__delay-action-btn:active { transform: scale(0.97); }
+
+.csc__delay-action-text { letter-spacing: -0.01em; }
+
+.csc__kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 4px;
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  font-weight: 700;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+.csc__kbd--warn {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.38);
+  color: #fbbf24;
+}
+
+/* Hairline Separator */
+.csc__separator {
+  height: 1px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ── Lower Deck: Session Title & Live Progress Rail ── */
+.csc__lower {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.csc__session-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.csc__title-tag {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--color-accent);
+  background: rgba(99, 102, 241, 0.12);
+  padding: 2.5px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  flex-shrink: 0;
+}
+
+.csc__title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #f3f4f6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.35;
+}
+
+/* Progress bar container */
 .csc__progress-container {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
 }
 
 .csc__progress {
-  height: 4px;
+  height: 5px;
   background: rgba(255, 255, 255, 0.07);
   border-radius: var(--radius-pill);
   overflow: hidden;
@@ -339,129 +460,15 @@
 }
 
 .csc__progress-sub {
-  font-size: 9.5px;
+  font-size: 10px;
   color: var(--color-text-faint);
 }
 
 .csc__progress-pct {
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 10px;
   font-weight: 700;
   color: var(--color-text-muted);
-}
-
-/* ── Right Column: Timer + Actions ── */
-.csc__right-col {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 12px;
-  flex-shrink: 0;
-}
-
-/* The big timer — compact but impactful */
-.csc__timer {
-  font-family: var(--font-mono);
-  font-size: 30px;
-  font-weight: 800;
-  color: #34d399;
-  letter-spacing: -0.06em;
-  line-height: 1;
-  text-shadow: 0 0 16px rgba(52, 211, 153, 0.4);
-}
-
-.csc__timer--warn {
-  color: #fbbf24;
-  text-shadow: 0 0 16px rgba(251, 191, 36, 0.4);
-}
-
-.csc__timer--overrun {
-  color: #f87171;
-  text-shadow: 0 0 20px rgba(248, 113, 113, 0.5);
-  animation: overrun-flash 2s infinite;
-}
-
-@keyframes overrun-flash {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.75; }
-}
-
-/* Inline action buttons — side by side */
-.csc__actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.csc__action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 13px;
-  font-weight: 600;
-  font-size: 12px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  white-space: nowrap;
-  border: none;
-}
-
-.csc__action-btn--hero {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-  color: #fff;
-  box-shadow: 0 3px 14px rgba(99, 102, 241, 0.4);
-}
-.csc__action-btn--hero:hover {
-  box-shadow: 0 5px 20px rgba(99, 102, 241, 0.65);
-  transform: translateY(-1px);
-}
-
-.csc__delay-action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 13px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #fbbf24;
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  white-space: nowrap;
-}
-.csc__delay-action-btn:hover {
-  background: rgba(245, 158, 11, 0.2);
-  border-color: rgba(245, 158, 11, 0.65);
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.3);
-  transform: translateY(-1px);
-  color: #fff;
-}
-.csc__delay-action-btn:active { transform: scale(0.97); }
-
-.csc__delay-action-text { letter-spacing: -0.01em; }
-
-.csc__kbd {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 700;
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  color: #fff;
-}
-.csc__kbd--warn {
-  background: rgba(245, 158, 11, 0.2);
-  border-color: rgba(245, 158, 11, 0.38);
-  color: #fbbf24;
 }
 
 /* ── Empty / Standby State ── */
@@ -487,12 +494,4 @@
 .csc__empty-sub {
   font-size: var(--text-xs);
   color: var(--color-text-faint);
-}
-
-/* Vertical divider between columns */
-.csc__divider {
-  width: 1px;
-  align-self: stretch;
-  background: rgba(255, 255, 255, 0.06);
-  flex-shrink: 0;
 }
