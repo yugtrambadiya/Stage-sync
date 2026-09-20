@@ -62,29 +62,34 @@ function getBaseScheduleTimes(): { [key: string]: string } {
     };
   }
 
-  // Dynamic IST anchor: position Keynote right at the current hour in IST
-  // so the broadcast room reflects live in-progress state right now!
+  // Dynamic IST anchor: position Keynote so it is LIVE ON AIR right now!
+  // Keynote starts 15 minutes before the current time in IST
   const now = new Date();
   const timeStr = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: false, hour: '2-digit', minute: '2-digit' });
-  const [currentHour] = timeStr.split(':').map(Number);
-  const kH = currentHour;
+  const [currentHour, currentMin] = timeStr.split(':').map(Number);
+  
+  // Total current minutes in IST from midnight
+  const nowMinutes = currentHour * 60 + currentMin;
+  // Keynote started 15 minutes ago
+  const keynoteStart = Math.max(30, nowMinutes - 15);
 
-  const fmt = (h: number, m: number) => {
-    const hh = ((h % 24) + 24) % 24;
-    const mm = ((m % 60) + 60) % 60;
+  const fmtMin = (min: number) => {
+    const wrapped = ((min % 1440) + 1440) % 1440;
+    const hh = Math.floor(wrapped / 60);
+    const mm = wrapped % 60;
     return `${hh.toString().padStart(2, '0')}:${mm.toString().padStart(2, '0')}`;
   };
 
   return {
-    [A.OPENING]: fmt(kH - 1, 30),
-    [A.KEYNOTE]: fmt(kH, 0),
-    [A.WASM]: fmt(kH + 1, 0),
-    [A.PANEL]: fmt(kH + 2, 0),
-    [A.LUNCH]: fmt(kH + 2, 30),
-    [A.WORKSHOP]: fmt(kH + 3, 30),
-    [A.OPENSOURCE]: fmt(kH + 5, 0),
-    [A.HACKATHON]: fmt(kH + 6, 0),
-    [A.CLOSING]: fmt(kH + 6, 30),
+    [A.OPENING]: fmtMin(keynoteStart - 30),
+    [A.KEYNOTE]: fmtMin(keynoteStart),
+    [A.WASM]: fmtMin(keynoteStart + 45),
+    [A.PANEL]: fmtMin(keynoteStart + 75),
+    [A.LUNCH]: fmtMin(keynoteStart + 100),
+    [A.WORKSHOP]: fmtMin(keynoteStart + 125),
+    [A.OPENSOURCE]: fmtMin(keynoteStart + 160),
+    [A.HACKATHON]: fmtMin(keynoteStart + 185),
+    [A.CLOSING]: fmtMin(keynoteStart + 205),
   };
 }
 
@@ -201,35 +206,35 @@ export async function runSeed(prisma: PrismaClient) {
       description: 'Welcome address, lighting of the lamp, and introduction to TechNova 2025 by the Organizing Committee.',
     },
     {
-      id: A.KEYNOTE, title: 'Keynote: "AI at the Edge"', speakerId: S.ROHAN, time: '09:30', duration: 60, status: 'DELAYED',
+      id: A.KEYNOTE, title: 'Keynote: "AI at the Edge"', speakerId: S.ROHAN, time: '09:30', duration: 45, status: 'DELAYED',
       description: 'Dr. Rohan Verma explores how next-generation AI models are shrinking to run on edge devices — from wearables to agricultural drones — without cloud connectivity. Live demo included.',
     },
     {
-      id: A.WASM, title: 'Talk: "WebAssembly in Production"', speakerId: S.ANANYA, time: '10:30', duration: 60, status: 'UPCOMING',
+      id: A.WASM, title: 'Talk: "WebAssembly in Production"', speakerId: S.ANANYA, time: '10:30', duration: 30, status: 'UPCOMING',
       description: 'Ananya Krishnan shares a candid engineering retrospective on shipping WASM-powered features to 50M Flipkart users — the performance wins, the surprising failures, and what she would do differently.',
     },
     {
-      id: A.PANEL, title: 'Panel: "Startup Realities — From Dorm Room to Series B"', speakerId: S.ARJUN, time: '11:30', duration: 30, status: 'UPCOMING',
+      id: A.PANEL, title: 'Panel: "Startup Realities — From Dorm Room to Series B"', speakerId: S.ARJUN, time: '11:30', duration: 25, status: 'UPCOMING',
       description: 'Three founders discuss the unfiltered reality of building startups from college campuses — hiring, fundraising, pivoting under pressure, and staying technical as a CEO.',
     },
     {
-      id: A.LUNCH, title: 'Networking Lunch', speakerId: null, time: '12:00', duration: 60, status: 'UPCOMING',
-      description: 'Buffet lunch in the main foyer. A great opportunity to network with speakers, recruiters, and fellow delegates.',
+      id: A.LUNCH, title: 'Networking Lunch & High Tea', speakerId: null, time: '12:00', duration: 25, status: 'UPCOMING',
+      description: 'Buffet refreshments in the main foyer. A great opportunity to network with speakers, recruiters, and fellow delegates.',
     },
     {
-      id: A.WORKSHOP, title: 'Workshop: "Building Production Apps with LLMs"', speakerId: S.KIRAN, time: '13:00', duration: 90, status: 'UPCOMING',
-      description: 'Kiran Desai leads a hands-on 90-minute workshop. Participants will build a context-aware AI assistant with retrieval-augmented generation (RAG), structured outputs, and production-grade error handling. Laptops required.',
+      id: A.WORKSHOP, title: 'Workshop: "Building Production Apps with LLMs"', speakerId: S.KIRAN, time: '13:00', duration: 35, status: 'UPCOMING',
+      description: 'Kiran Desai leads a hands-on 35-minute workshop. Participants will build a context-aware AI assistant with retrieval-augmented generation (RAG), structured outputs, and production-grade error handling. Laptops required.',
     },
     {
-      id: A.OPENSOURCE, title: 'Talk: "Your First Open Source Career Move"', speakerId: S.MEERA, time: '14:30', duration: 60, status: 'UPCOMING',
+      id: A.OPENSOURCE, title: 'Talk: "Your First Open Source Career Move"', speakerId: S.MEERA, time: '14:30', duration: 25, status: 'UPCOMING',
       description: 'Meera Joshi shares a practical, step-by-step guide to landing your first impactful open source contribution — picking the right project, navigating codebases you didn\'t write, and converting OSS work into career opportunities.',
     },
     {
-      id: A.HACKATHON, title: 'TechNova Hackathon — Results & Awards Ceremony', speakerId: S.JURY, time: '15:30', duration: 30, status: 'UPCOMING',
+      id: A.HACKATHON, title: 'TechNova Hackathon — Results & Awards Ceremony', speakerId: S.JURY, time: '15:30', duration: 20, status: 'UPCOMING',
       description: 'The Hackathon Jury announces the winners of the TechNova 2025 Hackathon across four tracks: AI/ML, Web3, Sustainability, and Open Innovation. Cash prizes, internship offers, and trophies.',
     },
     {
-      id: A.CLOSING, title: 'Closing Ceremony', speakerId: S.PATEL, time: '16:00', duration: 30, status: 'UPCOMING',
+      id: A.CLOSING, title: 'Closing Ceremony', speakerId: S.PATEL, time: '16:00', duration: 15, status: 'UPCOMING',
       description: 'Director Dr. S. Patel delivers the closing address, thanks the organizing committee, speakers, sponsors, and delegates, and announces the date for TechNova 2026.',
     },
   ];

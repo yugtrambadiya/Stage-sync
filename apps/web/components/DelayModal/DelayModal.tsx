@@ -134,7 +134,12 @@ export function DelayModal({
       });
     } catch (err: unknown) {
       if (err instanceof ApiRequestError) {
-        setError(err.body.message || 'Failed to apply schedule delay');
+        if ((err.body as any)?.code === 'DELAY_CROSSES_MIDNIGHT') {
+          const max = (err.body as any)?.maxAllowedDelayMinutes ? ` (Maximum allowed delay is ${(err.body as any).maxAllowedDelayMinutes} min)` : '';
+          setError(`Cannot shift past midnight: Venue schedule must conclude before 23:59 IST${max}.`);
+        } else {
+          setError(err.body.message || 'Failed to apply schedule delay');
+        }
       } else {
         setError((err as Error).message || 'Failed to apply schedule delay');
       }
