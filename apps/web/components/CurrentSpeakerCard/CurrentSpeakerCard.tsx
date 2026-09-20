@@ -93,6 +93,7 @@ export function CurrentSpeakerCard({ item, onDelay, onScript }: Props) {
 
   return (
     <div className={`csc ${statusClass}`}>
+      {/* ── Compact Top Strip ── */}
       <div className="csc__header">
         <div className="csc__badge-group">
           <span className="badge badge--live">
@@ -111,8 +112,9 @@ export function CurrentSpeakerCard({ item, onDelay, onScript }: Props) {
         </div>
       </div>
 
+      {/* ── Horizontal Command Body: [Avatar+Name] | [Title+Progress] | [Timer+Actions] ── */}
       <div className="csc__body">
-        {/* Speaker Profile Header */}
+        {/* Left: Speaker identity */}
         <div className="csc__profile">
           <div className="csc__avatar" title={speakerName}>
             {initials}
@@ -126,57 +128,61 @@ export function CurrentSpeakerCard({ item, onDelay, onScript }: Props) {
           </div>
         </div>
 
-        {/* Session Title */}
-        <div className="csc__title-card">
-          <span className="csc__title-tag">CURRENT KEYNOTE</span>
-          <div className="csc__title">{item.title}</div>
-        </div>
+        {/* Vertical divider */}
+        <div className="csc__divider" />
 
-        {/* Live Countdown HUD */}
-        <div className="csc__hud">
-          <div className="csc__hud-top">
-            <span className="csc__hud-label">
-              <span className={`csc__hud-indicator ${isOverrun ? 'csc__hud-indicator--overrun' : isWarning ? 'csc__hud-indicator--warn' : 'csc__hud-indicator--live'}`} />
-              {isOverrun ? 'OVERRUN TIME' : 'TIME REMAINING'}
-            </span>
-            <span className="csc__hud-total num">
-              Total: {item.durationMinutes}m
-            </span>
+        {/* Center: Session title + live progress bar */}
+        <div className="csc__center-col">
+          <div className="csc__title-inline">
+            <span className="csc__title-tag">NOW PRESENTING</span>
+            <div className="csc__title" title={item.title}>{item.title}</div>
           </div>
 
+          <div className="csc__hud-mini">
+            <div className="csc__hud-top">
+              <span className="csc__hud-label">
+                <span className={`csc__hud-indicator ${isOverrun ? 'csc__hud-indicator--overrun' : isWarning ? 'csc__hud-indicator--warn' : 'csc__hud-indicator--live'}`} />
+                {isOverrun ? 'OVERRUN' : 'ELAPSED'}
+              </span>
+              <span className="csc__hud-total num">Total: {item.durationMinutes}m</span>
+            </div>
+            <div className="csc__progress-container">
+              <div className="csc__progress" suppressHydrationWarning>
+                <div
+                  className={`csc__progress-fill ${isWarning || isOverrun ? 'csc__progress-fill--warn' : ''}`}
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <div className="csc__progress-labels">
+                <span className="csc__progress-sub">
+                  {isOverrun ? 'Schedule delayed downstream' : 'Active presentation pace'}
+                </span>
+                <span className="csc__progress-pct num" suppressHydrationWarning>
+                  {Math.round(progress)}%
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Vertical divider */}
+        <div className="csc__divider" />
+
+        {/* Right: Timer + Quick actions */}
+        <div className="csc__right-col">
           <div className={timerClass} suppressHydrationWarning>
             {formatSeconds(remainingSec)}
           </div>
-
-          {/* Progress Bar & Status Pill */}
-          <div className="csc__progress-container">
-            <div className="csc__progress" suppressHydrationWarning>
-              <div
-                className={`csc__progress-fill ${isWarning || isOverrun ? 'csc__progress-fill--warn' : ''}`}
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <div className="csc__progress-labels">
-              <span className="csc__progress-sub">
-                {isOverrun ? 'Schedule delayed downstream' : 'Active presentation pace'}
-              </span>
-              <span className="csc__progress-pct num" suppressHydrationWarning>
-                {Math.round(progress)}% ELAPSED
-              </span>
-            </div>
+          <div className="csc__actions">
+            <button className="csc__action-btn csc__action-btn--hero" onClick={onScript} title="Generate AI transition announcement">
+              <span>✨ Script</span>
+              <kbd className="csc__kbd">G</kbd>
+            </button>
+            <button className="csc__delay-action-btn" onClick={onDelay} title="Mark schedule delay and cascade downstream">
+              <span className="csc__delay-action-text">⏱ Delay</span>
+              <kbd className="csc__kbd csc__kbd--warn">D</kbd>
+            </button>
           </div>
-        </div>
-
-        {/* Action Controls */}
-        <div className="csc__actions">
-          <button className="btn btn--primary csc__action-btn csc__action-btn--hero" onClick={onScript} title="Generate AI transition announcement">
-            <span>✨ Generate Script</span>
-            <kbd className="csc__kbd">G</kbd>
-          </button>
-          <button className="csc__delay-action-btn" onClick={onDelay} title="Mark schedule delay and cascade downstream">
-            <span className="csc__delay-action-text">⏱️ Mark Delay</span>
-            <kbd className="csc__kbd csc__kbd--warn">D</kbd>
-          </button>
         </div>
       </div>
     </div>

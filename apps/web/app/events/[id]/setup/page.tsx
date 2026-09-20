@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { eventsApi, speakersApi, agendaApi, ApiRequestError } from '@/lib/api';
 import { UnifiedEventHeader } from '@/components/UnifiedEventHeader/UnifiedEventHeader';
 import type { Event, Speaker, AgendaItem } from '@/lib/types';
@@ -66,11 +65,9 @@ export default function EventSetupPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [eventId, router]);
 
-  // View state & search
   const [activeTab, setActiveTab] = useState<'SPLIT' | 'AGENDA' | 'SPEAKERS'>('SPLIT');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Modals
   const [addSessionModalOpen, setAddSessionModalOpen] = useState(false);
   const [addSpeakerModalOpen, setAddSpeakerModalOpen] = useState(false);
 
@@ -123,10 +120,9 @@ export default function EventSetupPage() {
     const hours = Math.floor(totalRuntimeMinutes / 60);
     const mins = totalRuntimeMinutes % 60;
     if (hours === 0) return `${mins}m`;
-    return `${hours}h ${mins > 0 ? `${mins}m` : ''}`;
+    return `${hours}h${mins > 0 ? ` ${mins}m` : ''}`;
   }, [totalRuntimeMinutes]);
 
-  // Filtered lists
   const filteredAgenda = useMemo(() => {
     if (!searchQuery.trim()) return agenda;
     const q = searchQuery.toLowerCase();
@@ -152,7 +148,6 @@ export default function EventSetupPage() {
   const handleAddSpeaker = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!spkName.trim()) return;
-
     setSpkSubmitting(true);
     setSpkError(null);
     try {
@@ -164,10 +159,7 @@ export default function EventSetupPage() {
         biography: spkBio.trim() || undefined,
       });
       setSpeakers((prev) => [...prev, created]);
-      setSpkName('');
-      setSpkDesignation('');
-      setSpkOrg('');
-      setSpkBio('');
+      setSpkName(''); setSpkDesignation(''); setSpkOrg(''); setSpkBio('');
       setAddSpeakerModalOpen(false);
     } catch (err: unknown) {
       if (err instanceof ApiRequestError) {
@@ -181,7 +173,7 @@ export default function EventSetupPage() {
   };
 
   const handleDeleteSpeaker = async (id: string, name: string) => {
-    if (!confirm(`Are you sure you want to remove ${name}?`)) return;
+    if (!confirm(`Remove ${name} from the speaker roster?`)) return;
     try {
       await speakersApi.delete(id);
       setSpeakers((prev) => prev.filter((s) => s.id !== id));
@@ -193,7 +185,6 @@ export default function EventSetupPage() {
   const handleAddAgendaItem = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!agTitle.trim()) return;
-
     setAgSubmitting(true);
     setAgError(null);
     try {
@@ -205,21 +196,14 @@ export default function EventSetupPage() {
         durationMinutes: agDuration,
         speakerId: agSpeakerId || undefined,
       });
-
-      // Find speaker object if assigned to populate immediately
       const matchedSpeaker = speakers.find((s) => s.id === agSpeakerId);
-      const withSpeaker: AgendaItem = {
-        ...created,
-        speaker: matchedSpeaker,
-      };
-
+      const withSpeaker: AgendaItem = { ...created, speaker: matchedSpeaker };
       setAgenda((prev) =>
         [...prev, withSpeaker].sort(
           (a: AgendaItem, b: AgendaItem) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
         )
       );
-      setAgTitle('');
-      setAgSpeakerId('');
+      setAgTitle(''); setAgSpeakerId('');
       setAddSessionModalOpen(false);
     } catch (err: unknown) {
       if (err instanceof ApiRequestError) {
@@ -233,7 +217,7 @@ export default function EventSetupPage() {
   };
 
   const handleDeleteAgendaItem = async (id: string, title: string) => {
-    if (!confirm(`Are you sure you want to remove session: "${title}"?`)) return;
+    if (!confirm(`Remove session: "${title}"?`)) return;
     try {
       await agendaApi.delete(id);
       setAgenda((prev) => prev.filter((i) => i.id !== id));
@@ -244,108 +228,104 @@ export default function EventSetupPage() {
 
   return (
     <div className="setup-studio">
-      {/* ── Multi-Billion Company Unified Enterprise Header ── */}
+      {/* Unified Enterprise Header */}
       <UnifiedEventHeader
         eventId={eventId}
         eventName={event?.name}
         activeView="setup"
       />
 
-      {/* ── Breathable Hero Header ── */}
+      {/* ── Hero Command Area ── */}
       <section className="setup-hero">
         <div className="setup-hero__top">
-          <div>
+          <div className="setup-hero__identity">
             <div className="setup-hero__meta">
               <span className="setup-hero__beacon" />
-              <span className="setup-hero__eyebrow">Production Command Architecture</span>
+              <span className="setup-hero__eyebrow">Event Production Command Suite</span>
             </div>
             <h1 className="setup-hero__title">
-              {event?.name ?? 'Stage Architecture & Schedule Studio'}
+              {event?.name ?? 'Stage Architecture Studio'}
             </h1>
             <p className="setup-hero__desc">
-              Curate the master timetable, assign world-class keynote speakers, and configure live session transitions with millisecond precision.
+              Architect the master program timeline, curate your keynote roster, and configure every live session with precision.
             </p>
           </div>
 
           <div className="setup-hero__actions">
-            <button
-              className="setup-btn--primary"
-              onClick={() => setAddSessionModalOpen(true)}
-            >
-              <span>+ Add New Session</span>
+            <button className="setup-btn--primary" onClick={() => setAddSessionModalOpen(true)}>
+              <span>＋</span> New Session
             </button>
-            <button
-              className="setup-btn--glass"
-              onClick={() => setAddSpeakerModalOpen(true)}
-            >
-              <span>+ Add Speaker</span>
+            <button className="setup-btn--glass" onClick={() => setAddSpeakerModalOpen(true)}>
+              <span>＋</span> Add Speaker
             </button>
           </div>
         </div>
 
-        {/* ── 4 Executive Telemetry Metric Tiles ── */}
+        {/* Executive Metric Tiles */}
         <div className="setup-metrics">
-          <div className="setup-metric-card">
-            <div className="setup-metric-icon">📅</div>
+          <div className="setup-metric-card setup-metric-card--accent">
+            <div className="setup-metric-icon setup-metric-icon--indigo">📅</div>
             <div className="setup-metric-content">
               <span className="setup-metric-label">Scheduled Sessions</span>
-              <span className="setup-metric-value num">{agenda.length} Keynotes & Talks</span>
+              <span className="setup-metric-value num">{agenda.length}</span>
+              <span className="setup-metric-sub">Keynotes &amp; Talks</span>
             </div>
           </div>
 
-          <div className="setup-metric-card">
-            <div className="setup-metric-icon">🎙️</div>
+          <div className="setup-metric-card setup-metric-card--green">
+            <div className="setup-metric-icon setup-metric-icon--green">🎙️</div>
             <div className="setup-metric-content">
-              <span className="setup-metric-label">Keynote Roster</span>
-              <span className="setup-metric-value num">{speakers.length} Speakers Registered</span>
+              <span className="setup-metric-label">Speaker Roster</span>
+              <span className="setup-metric-value num">{speakers.length}</span>
+              <span className="setup-metric-sub">Registered Speakers</span>
             </div>
           </div>
 
-          <div className="setup-metric-card">
-            <div className="setup-metric-icon">⏱️</div>
+          <div className="setup-metric-card setup-metric-card--amber">
+            <div className="setup-metric-icon setup-metric-icon--amber">⏱️</div>
             <div className="setup-metric-content">
               <span className="setup-metric-label">Total Stage Runtime</span>
-              <span className="setup-metric-value num">{totalRuntimeFormatted} Allotted</span>
+              <span className="setup-metric-value num">{totalRuntimeFormatted || '—'}</span>
+              <span className="setup-metric-sub">Allotted Program</span>
             </div>
           </div>
 
           <div className="setup-metric-card">
-            <div className="setup-metric-icon" style={{ color: 'var(--color-live)' }}>📡</div>
+            <div className="setup-metric-icon setup-metric-icon--slate">📡</div>
             <div className="setup-metric-content">
               <span className="setup-metric-label">Broadcast Telemetry</span>
-              <span className="setup-metric-value" style={{ color: 'var(--color-live)' }}>
-                READY TO AIR
-              </span>
+              <span className="setup-metric-value" style={{ color: 'var(--color-live)', fontSize: '14px', fontWeight: 700 }}>READY TO AIR</span>
+              <span className="setup-metric-sub">All systems nominal</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── Breathable View Switcher & Search Bar ── */}
+      {/* ── View Switcher & Search ── */}
       <div className="setup-controls">
         <div className="setup-view-tabs" role="tablist">
           <button
             className={`setup-view-tab ${activeTab === 'SPLIT' ? 'setup-view-tab--active' : ''}`}
             onClick={() => setActiveTab('SPLIT')}
           >
-            ⊞ Studio Split View
+            ⊞ Split View
           </button>
           <button
             className={`setup-view-tab ${activeTab === 'AGENDA' ? 'setup-view-tab--active' : ''}`}
             onClick={() => setActiveTab('AGENDA')}
           >
-            📅 Master Agenda ({agenda.length})
+            📅 Agenda ({agenda.length})
           </button>
           <button
             className={`setup-view-tab ${activeTab === 'SPEAKERS' ? 'setup-view-tab--active' : ''}`}
             onClick={() => setActiveTab('SPEAKERS')}
           >
-            🎙️ Speaker Directory ({speakers.length})
+            🎙️ Speakers ({speakers.length})
           </button>
         </div>
 
         <div className="setup-search-box">
-          <span style={{ color: 'var(--color-text-muted)', fontSize: '13px' }}>🔍</span>
+          <span style={{ color: 'var(--color-text-faint)', fontSize: '12px' }}>🔍</span>
           <input
             className="setup-search-input"
             type="text"
@@ -356,7 +336,7 @@ export default function EventSetupPage() {
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: '12px' }}
+              style={{ background: 'none', border: 'none', color: 'var(--color-text-faint)', cursor: 'pointer', fontSize: '11px', padding: '0 2px' }}
             >
               ✕
             </button>
@@ -364,42 +344,41 @@ export default function EventSetupPage() {
         </div>
       </div>
 
-      {/* ── Main Studio Content ── */}
+      {/* ── Main Content ── */}
       <main className="setup-content">
         {loading && (
-          <div className="setup-split-grid">
-            <div className="panel skeleton" style={{ height: 420 }} />
-            <div className="panel skeleton" style={{ height: 420 }} />
+          <div className={activeTab === 'SPLIT' ? 'setup-split-grid' : 'setup-single-view'}>
+            <div className="panel skeleton" style={{ height: 380 }} />
+            {activeTab === 'SPLIT' && <div className="panel skeleton" style={{ height: 380 }} />}
           </div>
         )}
 
         {error && !loading && (
           <div className="setup-panel" style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
-            <p style={{ color: 'var(--color-danger)', marginBottom: 'var(--space-4)' }}>{error}</p>
-            <button className="setup-btn--primary" onClick={loadData}>
-              Retry Connection
-            </button>
+            <p style={{ color: 'var(--color-danger)', marginBottom: 'var(--space-4)', fontSize: '13px' }}>{error}</p>
+            <button className="setup-btn--primary" onClick={loadData}>Retry Connection</button>
           </div>
         )}
 
         {!loading && !error && (
           <div className={activeTab === 'SPLIT' ? 'setup-split-grid' : 'setup-single-view'}>
-            {/* 1. AGENDA PANEL */}
+
+            {/* ── AGENDA PANEL ── */}
             {(activeTab === 'SPLIT' || activeTab === 'AGENDA') && (
               <div className="setup-panel">
                 <div className="setup-panel__header">
                   <div className="setup-panel__title">
                     <span>📅</span>
-                    <span>Master Stage Agenda Timeline</span>
+                    <span>Master Stage Timeline</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span className="setup-panel__count num">{filteredAgenda.length} Sessions</span>
                     <button
                       className="setup-btn--primary"
-                      style={{ padding: '4px 12px', fontSize: '12px' }}
+                      style={{ padding: '5px 12px', fontSize: '11.5px', borderRadius: '7px' }}
                       onClick={() => setAddSessionModalOpen(true)}
                     >
-                      + Add
+                      ＋ Add
                     </button>
                   </div>
                 </div>
@@ -407,16 +386,17 @@ export default function EventSetupPage() {
                 {filteredAgenda.length === 0 ? (
                   <div className="setup-empty">
                     <span className="setup-empty-icon">📅</span>
-                    <span style={{ fontWeight: 600, color: 'var(--color-text-secondary)' }}>
-                      {searchQuery ? 'No matching sessions found' : 'No agenda sessions configured yet'}
+                    <span className="setup-empty-title">
+                      {searchQuery ? 'No matching sessions' : 'No sessions scheduled yet'}
                     </span>
-                    <button
-                      className="setup-btn--glass"
-                      style={{ marginTop: '8px' }}
-                      onClick={() => setAddSessionModalOpen(true)}
-                    >
-                      + Add First Session
-                    </button>
+                    <span className="setup-empty-sub">
+                      {searchQuery ? 'Try a different search term.' : 'Add your first session to build the master agenda.'}
+                    </span>
+                    {!searchQuery && (
+                      <button className="setup-btn--glass" style={{ marginTop: '4px' }} onClick={() => setAddSessionModalOpen(true)}>
+                        ＋ Schedule First Session
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <div className="setup-agenda-list">
@@ -427,12 +407,8 @@ export default function EventSetupPage() {
                       return (
                         <div key={item.id} className="setup-agenda-item">
                           <div className="setup-agenda-time-col">
-                            <span className="setup-agenda-time num">
-                              {formatTime(item.startTime)}
-                            </span>
-                            <span className="setup-agenda-dur num">
-                              {item.durationMinutes}m duration
-                            </span>
+                            <span className="setup-agenda-time">{formatTime(item.startTime)}</span>
+                            <span className="setup-agenda-dur">{item.durationMinutes}m</span>
                           </div>
 
                           <div className="setup-agenda-content">
@@ -440,7 +416,19 @@ export default function EventSetupPage() {
                               <span className={`timeline__tag timeline__tag--${category.tone}`}>
                                 {category.label}
                               </span>
-                              <span className="badge badge--upcoming" style={{ fontSize: '9px', padding: '1px 6px' }}>
+                              <span
+                                style={{
+                                  fontFamily: 'var(--font-mono)',
+                                  fontSize: '9px',
+                                  color: item.status === 'DELAYED' ? 'var(--color-warn)' : 'var(--color-text-faint)',
+                                  letterSpacing: '0.06em',
+                                  padding: '1px 6px',
+                                  borderRadius: '4px',
+                                  background: item.status === 'DELAYED' ? 'rgba(245,158,11,0.12)' : 'rgba(255,255,255,0.04)',
+                                  border: '1px solid',
+                                  borderColor: item.status === 'DELAYED' ? 'rgba(245,158,11,0.25)' : 'rgba(255,255,255,0.07)',
+                                }}
+                              >
                                 {item.status}
                               </span>
                             </div>
@@ -464,7 +452,7 @@ export default function EventSetupPage() {
                             <button
                               className="setup-delete-btn"
                               onClick={() => handleDeleteAgendaItem(item.id, item.title)}
-                              title="Delete Session"
+                              title="Remove Session"
                             >
                               ✕ Remove
                             </button>
@@ -477,22 +465,22 @@ export default function EventSetupPage() {
               </div>
             )}
 
-            {/* 2. SPEAKERS PANEL */}
+            {/* ── SPEAKERS PANEL ── */}
             {(activeTab === 'SPLIT' || activeTab === 'SPEAKERS') && (
               <div className="setup-panel">
                 <div className="setup-panel__header">
                   <div className="setup-panel__title">
                     <span>🎙️</span>
-                    <span>Keynote & Guest Speaker Roster</span>
+                    <span>Speaker Roster</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span className="setup-panel__count num">{filteredSpeakers.length} Speakers</span>
                     <button
                       className="setup-btn--glass"
-                      style={{ padding: '4px 12px', fontSize: '12px' }}
+                      style={{ padding: '5px 12px', fontSize: '11.5px', borderRadius: '7px' }}
                       onClick={() => setAddSpeakerModalOpen(true)}
                     >
-                      + Add
+                      ＋ Add
                     </button>
                   </div>
                 </div>
@@ -500,16 +488,17 @@ export default function EventSetupPage() {
                 {filteredSpeakers.length === 0 ? (
                   <div className="setup-empty">
                     <span className="setup-empty-icon">🎙️</span>
-                    <span style={{ fontWeight: 600, color: 'var(--color-text-secondary)' }}>
-                      {searchQuery ? 'No matching speakers found' : 'No speakers added to the roster yet'}
+                    <span className="setup-empty-title">
+                      {searchQuery ? 'No matching speakers' : 'No speakers on the roster'}
                     </span>
-                    <button
-                      className="setup-btn--glass"
-                      style={{ marginTop: '8px' }}
-                      onClick={() => setAddSpeakerModalOpen(true)}
-                    >
-                      + Register First Speaker
-                    </button>
+                    <span className="setup-empty-sub">
+                      {searchQuery ? 'Try a different search term.' : 'Register speakers to assign them to sessions.'}
+                    </span>
+                    {!searchQuery && (
+                      <button className="setup-btn--glass" style={{ marginTop: '4px' }} onClick={() => setAddSpeakerModalOpen(true)}>
+                        ＋ Register First Speaker
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <div className="setup-speakers-list">
@@ -529,9 +518,9 @@ export default function EventSetupPage() {
                                 {[spk.designation, spk.organization].filter(Boolean).join(' · ')}
                               </div>
                               {assignedSessions.length > 0 && (
-                                <span style={{ fontSize: '10px', color: 'var(--color-accent)', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>
-                                  ● {assignedSessions.length} {assignedSessions.length === 1 ? 'Session' : 'Sessions'} Assigned
-                                </span>
+                                <div className="setup-speaker-assignment">
+                                  ● {assignedSessions.length} {assignedSessions.length === 1 ? 'session' : 'sessions'} assigned
+                                </div>
                               )}
                               {spk.biography && (
                                 <div className="setup-speaker-bio" title={spk.biography}>
@@ -559,15 +548,15 @@ export default function EventSetupPage() {
         )}
       </main>
 
-      {/* ── Glassmorphic Modal: Add Session ── */}
+      {/* ── Modal: Add Session ── */}
       {addSessionModalOpen && (
         <div className="setup-modal-backdrop" onClick={() => setAddSessionModalOpen(false)}>
           <div className="setup-modal" onClick={(e) => e.stopPropagation()}>
             <div className="setup-modal__header">
-              <span className="setup-modal__title">📅 Schedule New Agenda Session</span>
-              <button className="setup-modal__close" onClick={() => setAddSessionModalOpen(false)}>
-                ✕
-              </button>
+              <span className="setup-modal__title">
+                <span>📅</span> Schedule New Session
+              </span>
+              <button className="setup-modal__close" onClick={() => setAddSessionModalOpen(false)}>✕</button>
             </div>
 
             <form onSubmit={handleAddAgendaItem}>
@@ -585,7 +574,7 @@ export default function EventSetupPage() {
                 </div>
 
                 <div className="setup-field">
-                  <label className="setup-field-label">Assigned Keynote Speaker</label>
+                  <label className="setup-field-label">Assigned Speaker</label>
                   <select
                     className="setup-field-select"
                     value={agSpeakerId}
@@ -600,7 +589,7 @@ export default function EventSetupPage() {
                   </select>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '14px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '12px' }}>
                   <div className="setup-field">
                     <label className="setup-field-label">Scheduled Start Time *</label>
                     <input
@@ -612,7 +601,7 @@ export default function EventSetupPage() {
                     />
                   </div>
                   <div className="setup-field">
-                    <label className="setup-field-label">Duration (Minutes) *</label>
+                    <label className="setup-field-label">Duration (mins) *</label>
                     <input
                       className="setup-field-input num"
                       type="number"
@@ -625,23 +614,14 @@ export default function EventSetupPage() {
                   </div>
                 </div>
 
-                {/* Duration Presets */}
-                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>PRESETS:</span>
+                <div className="setup-duration-presets">
+                  <span className="setup-duration-label">Quick:</span>
                   {[15, 30, 45, 60, 90].map((mins) => (
                     <button
                       key={mins}
                       type="button"
+                      className={`setup-duration-pill ${agDuration === mins ? 'setup-duration-pill--active' : ''}`}
                       onClick={() => setAgDuration(mins)}
-                      style={{
-                        padding: '3px 9px',
-                        fontSize: '11px',
-                        borderRadius: 'var(--radius-pill)',
-                        background: agDuration === mins ? 'var(--color-accent)' : 'rgba(255,255,255,0.06)',
-                        color: agDuration === mins ? '#fff' : 'var(--color-text-muted)',
-                        border: '1px solid var(--color-border)',
-                        cursor: 'pointer',
-                      }}
                     >
                       {mins}m
                     </button>
@@ -649,26 +629,18 @@ export default function EventSetupPage() {
                 </div>
 
                 {agError && (
-                  <div style={{ color: 'var(--color-danger)', fontSize: 'var(--text-xs)', background: 'rgba(239, 68, 68, 0.1)', padding: '8px 12px', borderRadius: 'var(--radius-sm)' }}>
+                  <div style={{ color: 'var(--color-danger)', fontSize: '12px', background: 'rgba(239, 68, 68, 0.1)', padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.25)' }}>
                     {agError}
                   </div>
                 )}
               </div>
 
               <div className="setup-modal__footer">
-                <button
-                  type="button"
-                  className="btn btn--ghost btn--sm"
-                  onClick={() => setAddSessionModalOpen(false)}
-                >
+                <button type="button" className="setup-btn--glass" style={{ padding: '7px 16px', fontSize: '12px' }} onClick={() => setAddSessionModalOpen(false)}>
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="setup-btn--primary"
-                  disabled={agSubmitting}
-                >
-                  {agSubmitting ? 'Creating Session...' : 'Create Session'}
+                <button type="submit" className="setup-btn--primary" style={{ padding: '7px 18px', fontSize: '12px' }} disabled={agSubmitting}>
+                  {agSubmitting ? 'Creating…' : 'Create Session'}
                 </button>
               </div>
             </form>
@@ -676,15 +648,15 @@ export default function EventSetupPage() {
         </div>
       )}
 
-      {/* ── Glassmorphic Modal: Add Speaker ── */}
+      {/* ── Modal: Add Speaker ── */}
       {addSpeakerModalOpen && (
         <div className="setup-modal-backdrop" onClick={() => setAddSpeakerModalOpen(false)}>
           <div className="setup-modal" onClick={(e) => e.stopPropagation()}>
             <div className="setup-modal__header">
-              <span className="setup-modal__title">🎙️ Register Keynote Speaker</span>
-              <button className="setup-modal__close" onClick={() => setAddSpeakerModalOpen(false)}>
-                ✕
-              </button>
+              <span className="setup-modal__title">
+                <span>🎙️</span> Register Keynote Speaker
+              </span>
+              <button className="setup-modal__close" onClick={() => setAddSpeakerModalOpen(false)}>✕</button>
             </div>
 
             <form onSubmit={handleAddSpeaker}>
@@ -701,21 +673,21 @@ export default function EventSetupPage() {
                   />
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <div className="setup-field">
                     <label className="setup-field-label">Designation / Role</label>
                     <input
                       className="setup-field-input"
-                      placeholder="e.g. Head of AI Lab"
+                      placeholder="Head of AI Lab"
                       value={spkDesignation}
                       onChange={(e) => setSpkDesignation(e.target.value)}
                     />
                   </div>
                   <div className="setup-field">
-                    <label className="setup-field-label">Organization / Affiliation</label>
+                    <label className="setup-field-label">Organization</label>
                     <input
                       className="setup-field-input"
-                      placeholder="e.g. IIT Bombay"
+                      placeholder="IIT Bombay"
                       value={spkOrg}
                       onChange={(e) => setSpkOrg(e.target.value)}
                     />
@@ -723,36 +695,28 @@ export default function EventSetupPage() {
                 </div>
 
                 <div className="setup-field">
-                  <label className="setup-field-label">Professional Biography (Optional)</label>
+                  <label className="setup-field-label">Professional Biography</label>
                   <textarea
                     className="setup-field-textarea"
-                    placeholder="Brief speaker background, domain expertise, and keynote introduction notes..."
+                    placeholder="Speaker background, domain expertise, and keynote introduction…"
                     value={spkBio}
                     onChange={(e) => setSpkBio(e.target.value)}
                   />
                 </div>
 
                 {spkError && (
-                  <div style={{ color: 'var(--color-danger)', fontSize: 'var(--text-xs)', background: 'rgba(239, 68, 68, 0.1)', padding: '8px 12px', borderRadius: 'var(--radius-sm)' }}>
+                  <div style={{ color: 'var(--color-danger)', fontSize: '12px', background: 'rgba(239, 68, 68, 0.1)', padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.25)' }}>
                     {spkError}
                   </div>
                 )}
               </div>
 
               <div className="setup-modal__footer">
-                <button
-                  type="button"
-                  className="btn btn--ghost btn--sm"
-                  onClick={() => setAddSpeakerModalOpen(false)}
-                >
+                <button type="button" className="setup-btn--glass" style={{ padding: '7px 16px', fontSize: '12px' }} onClick={() => setAddSpeakerModalOpen(false)}>
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="setup-btn--primary"
-                  disabled={spkSubmitting}
-                >
-                  {spkSubmitting ? 'Registering...' : 'Register Speaker'}
+                <button type="submit" className="setup-btn--primary" style={{ padding: '7px 18px', fontSize: '12px' }} disabled={spkSubmitting}>
+                  {spkSubmitting ? 'Registering…' : 'Register Speaker'}
                 </button>
               </div>
             </form>
