@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { aiApi } from '../../lib/api';
 import { useStageStore } from '../../store/useStageStore';
+import { speakBroadcastScript, stopBroadcastSpeech } from '../../lib/speech';
 import type { Script } from '../../lib/types';
 import './ScriptModal.css';
 
@@ -46,10 +47,8 @@ export function ScriptModal({
   const modalRef = useRef<HTMLDivElement>(null);
 
   const stopSpeaking = useCallback(() => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
-    }
+    stopBroadcastSpeech();
+    setIsSpeaking(false);
   }, []);
 
   const generate = useCallback(async () => {
@@ -161,18 +160,15 @@ export function ScriptModal({
   };
 
   const handleSpeakToggle = () => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-
     if (isSpeaking) {
       stopSpeaking();
     } else {
-      stopSpeaking();
-      const utterance = new SpeechSynthesisUtterance(scriptContent);
-      utterance.rate = 0.95;
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
-      window.speechSynthesis.speak(utterance);
       setIsSpeaking(true);
+      speakBroadcastScript(
+        scriptContent,
+        () => setIsSpeaking(false),
+        () => setIsSpeaking(false)
+      );
     }
   };
 

@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { useParams } from 'next/navigation';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { eventsApi } from '@/lib/api';
 import { useStageStore } from '@/store/useStageStore';
+import { speakBroadcastScript, stopBroadcastSpeech } from '@/lib/speech';
 import type { Event, Script } from '@/lib/types';
-import { EventNav } from '@/components/EventNav/EventNav';
+import './scripts.css';
 
 function formatTimestamp(iso: string): { relative: string; absolute: string } {
   try {
@@ -25,19 +26,65 @@ function formatTimestamp(iso: string): { relative: string; absolute: string } {
   }
 }
 
+function computeReadTime(text: string): { words: number; seconds: number; formatted: string } {
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  // Professional broadcast reading rate ~130-140 words/min (approx 2.2 words/sec)
+  const seconds = Math.max(10, Math.round((words / 135) * 60));
+  const formatted = seconds >= 60 ? `~${Math.round(seconds / 60)}m read` : `~${seconds}s read`;
+  return { words, seconds, formatted };
+}
+
+const DEFAULT_SCRIPTS: Script[] = [
+  {
+    id: 'scr-demo-1',
+    eventId: 'evt_technova_2025',
+    type: 'TRANSITION',
+    content: "Please join me in giving another immense round of applause for Dr. Rohan Verma for that groundbreaking keynote on Edge AI architectures! We are deeply appreciative of his brilliant insights. Next up, we are privileged to welcome Ananya Krishnan, Senior Staff Engineer at Flipkart, who will take us deep into 'WebAssembly in Production'. Let's give Ananya a warm TechNova welcome!",
+    aiGenerated: true,
+    used: false,
+    createdAt: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'scr-demo-2',
+    eventId: 'evt_technova_2025',
+    type: 'ANNOUNCEMENT',
+    content: "Attention delegates and attendees: The interactive workshop on 'Building Production Apps with LLMs' led by Google's Kiran Desai will commence at 13:15 in Auditorium B. Please take your seats early as seating is limited.",
+    aiGenerated: true,
+    used: true,
+    createdAt: new Date(Date.now() - 35 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'scr-demo-3',
+    eventId: 'evt_technova_2025',
+    type: 'TRANSITION',
+    content: "Thank you so much to Ananya Krishnan for that masterclass on WebAssembly performance! Next on our main stage is a premier executive panel: 'Startup Realities — From Dorm Room to Series B', moderated by Arjun Malhotra. Please welcome our esteemed panelists to the stage!",
+    aiGenerated: true,
+    used: false,
+    createdAt: new Date(Date.now() - 55 * 60 * 1000).toISOString(),
+  },
+];
+
 export default function EventScriptsPage() {
   const params = useParams();
+  const router = useRouter();
   const eventId = typeof params?.id === 'string' ? params.id : '';
 
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Filter & Search
   const [filterType, setFilterType] = useState<string>('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Interactive Card State (first script in Teleprompter HUD by default for immediate preview)
+  const [expandedId, setExpandedId] = useState<string | null>('scr-demo-1');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
 
   // Store scripts
   const storeScripts = useStageStore((s) => s.scripts);
+  const addScript = useStageStore((s) => s.addScript);
   const markScriptUsed = useStageStore((s) => s.markScriptUsed);
 
   useEffect(() => {
@@ -56,12 +103,64 @@ export default function EventScriptsPage() {
       });
   }, [eventId]);
 
+  // Seed default scripts on first visit if none generated yet
+  useEffect(() => {
+    if (storeScripts.length === 0 && eventId) {
+      DEFAULT_SCRIPTS.forEach((sc) => addScript({ ...sc, eventId }));
+    }
+  }, [storeScripts.length, eventId, addScript]);
+
+  // Keyboard shortcut: Press L to jump straight to Live Control Room
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLSelectElement
+      ) {
+        return;
+      }
+      if (e.key === 'l' || e.key === 'L') {
+        e.preventDefault();
+        router.push(`/events/${eventId}/live`);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [eventId, router]);
+
+  // Clean up audio on unmount
+  useEffect(() => {
+    return () => {
+      stopBroadcastSpeech();
+    };
+  }, []);
+
+  // Filtered list
   const displayedScripts = useMemo(() => {
     return storeScripts.filter((sc) => {
-      if (filterType === 'ALL') return true;
-      return sc.type === filterType;
+      const matchesType = filterType === 'ALL' ? true : sc.type === filterType;
+      const matchesSearch = searchQuery.trim()
+        ? sc.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          sc.type.toLowerCase().includes(searchQuery.toLowerCase())
+        : true;
+      return matchesType && matchesSearch;
     });
-  }, [storeScripts, filterType]);
+  }, [storeScripts, filterType, searchQuery]);
+
+  // Total read time
+  const totalReadSeconds = useMemo(() => {
+    return storeScripts.reduce((acc, sc) => acc + computeReadTime(sc.content).seconds, 0);
+  }, [storeScripts]);
+
+  const totalReadFormatted = useMemo(() => {
+    const mins = Math.round(totalReadSeconds / 60);
+    return mins > 0 ? `~${mins} mins` : `${totalReadSeconds}s`;
+  }, [totalReadSeconds]);
+
+  const readyCount = useMemo(() => {
+    return storeScripts.filter((s) => !s.used).length;
+  }, [storeScripts]);
 
   const handleCopy = async (id: string, text: string) => {
     try {
@@ -82,145 +181,318 @@ export default function EventScriptsPage() {
     }
   };
 
+  const handleAudioToggle = useCallback((id: string, text: string) => {
+    if (speakingId === id) {
+      stopBroadcastSpeech();
+      setSpeakingId(null);
+    } else {
+      setSpeakingId(id);
+      speakBroadcastScript(
+        text,
+        () => setSpeakingId(null),
+        () => setSpeakingId(null)
+      );
+    }
+  }, [speakingId]);
+
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--color-bg)' }}>
-      <header className="app-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-          <Link href="/events" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, letterSpacing: '0.08em', fontSize: 'var(--text-sm)' }}>
+    <div className="scripts-studio">
+      {/* ── Unified Frosted Glass Header ── */}
+      <header className="scripts-header">
+        <div className="scripts-header__left">
+          <Link href="/events" className="scripts-header__brand">
+            <span className="scripts-header__logo-dot" />
+            <span className="scripts-header__logo-text">
               STAGE<span style={{ color: 'var(--color-accent)' }}>SYNC</span>
             </span>
           </Link>
-          <span style={{ color: 'var(--color-border)' }}>|</span>
-          <span style={{ fontWeight: 600, fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>
-            {event?.name ?? 'Scripts History'}
+          <span className="scripts-header__sep">/</span>
+          <span className="scripts-header__event-tag" title={event?.name ?? 'Scripts Studio'}>
+            {event?.name ?? 'Live Scripts Studio'}
           </span>
         </div>
 
-        <Link href={`/events/${eventId}/live`} className="btn btn--primary btn--sm">
-          ● Open Live Control Room
-        </Link>
+        {/* Center Segmented Navigation */}
+        <nav className="scripts-header__nav" aria-label="Event views">
+          <Link href={`/events/${eventId}/live`} className="scripts-header__tab">
+            Live Stage
+          </Link>
+          <Link href={`/events/${eventId}/setup`} className="scripts-header__tab">
+            Setup & Agenda
+          </Link>
+          <Link href={`/events/${eventId}/scripts`} className="scripts-header__tab scripts-header__tab--active">
+            AI Scripts
+          </Link>
+        </nav>
+
+        {/* Next-To-Next Level Live Control Room Launcher */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <Link
+            href={`/events/${eventId}/live`}
+            className="scripts-launcher-btn"
+            title="Launch Live Broadcast Control Room (Hotkey: L)"
+          >
+            <span className="scripts-launcher-beacon" />
+            <span>● Launch Live Control Room</span>
+            <span className="scripts-launcher-kbd">L</span>
+            <span>→</span>
+          </Link>
+        </div>
       </header>
 
-      <EventNav eventId={eventId} eventName={event?.name} />
-
-      <main className="container" style={{ flex: 1, padding: 'var(--space-6)' }}>
-        <div className="page-header" style={{ marginBottom: 'var(--space-6)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* ── Hero Studio Section ── */}
+      <section className="scripts-hero">
+        <div className="scripts-hero__top">
           <div>
-            <h1 style={{ margin: 0, fontSize: 'var(--text-xl)', fontWeight: 700 }}>
+            <div className="scripts-hero__meta">
+              <span className="scripts-hero__beacon" />
+              <span className="scripts-hero__eyebrow">AI Teleprompter & Speech Intelligence</span>
+            </div>
+            <h1 className="scripts-hero__title">
               AI Broadcast Scripts Archive
             </h1>
-            <p style={{ margin: 'var(--space-2) 0 0', color: 'var(--color-text-muted)', fontSize: 'var(--text-xs)' }}>
-              All stage teleprompter scripts, announcements, and transitions generated during this event.
+            <p className="scripts-hero__desc">
+              All stage teleprompter scripts, announcements, and transitions generated during this event. Audio playback powered by humanized keynote voice synthesis.
             </p>
           </div>
 
-          <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-            {(['ALL', 'TRANSITION', 'ANNOUNCEMENT'] as const).map((t) => (
-              <button
-                key={t}
-                className={`btn btn--sm ${filterType === t ? 'btn--primary' : 'btn--ghost'}`}
-                onClick={() => setFilterType(t)}
-              >
-                {t}
-              </button>
-            ))}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Link
+              href={`/events/${eventId}/live`}
+              className="setup-btn--primary"
+              style={{ padding: '9px 18px' }}
+            >
+              <span>✨ Generate New in Control Room</span>
+              <span>→</span>
+            </Link>
           </div>
         </div>
 
+        {/* ── 4 Executive Metrics ── */}
+        <div className="scripts-metrics">
+          <div className="scripts-metric-card">
+            <div className="scripts-metric-icon">📜</div>
+            <div className="scripts-metric-content">
+              <span className="scripts-metric-label">Archived Scripts</span>
+              <span className="scripts-metric-value num">{storeScripts.length} Generated</span>
+            </div>
+          </div>
+
+          <div className="scripts-metric-card">
+            <div className="scripts-metric-icon">⚡</div>
+            <div className="scripts-metric-content">
+              <span className="scripts-metric-label">Stage Ready Prompters</span>
+              <span className="scripts-metric-value num" style={{ color: 'var(--color-live)' }}>
+                {readyCount} Ready to Air
+              </span>
+            </div>
+          </div>
+
+          <div className="scripts-metric-card">
+            <div className="scripts-metric-icon">⏱️</div>
+            <div className="scripts-metric-content">
+              <span className="scripts-metric-label">Total Prompter Cadence</span>
+              <span className="scripts-metric-value num">{totalReadFormatted}</span>
+            </div>
+          </div>
+
+          <div className="scripts-metric-card">
+            <div className="scripts-metric-icon" style={{ color: 'var(--color-accent)' }}>🎙️</div>
+            <div className="scripts-metric-content">
+              <span className="scripts-metric-label">Voice Synthesizer</span>
+              <span className="scripts-metric-value" style={{ color: 'var(--color-accent)', fontSize: '13px' }}>
+                NEURAL MC VOICE
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Controls & Filter Bar ── */}
+      <div className="scripts-controls">
+        <div className="scripts-filter-pills" role="tablist">
+          {(['ALL', 'TRANSITION', 'ANNOUNCEMENT'] as const).map((t) => (
+            <button
+              key={t}
+              className={`scripts-filter-pill ${filterType === t ? 'scripts-filter-pill--active' : ''}`}
+              onClick={() => setFilterType(t)}
+            >
+              {t === 'ALL' ? `All Scripts (${storeScripts.length})` : t === 'TRANSITION' ? 'Transitions' : 'Announcements'}
+            </button>
+          ))}
+        </div>
+
+        <div className="scripts-search-box">
+          <span style={{ color: 'var(--color-text-muted)', fontSize: '13px' }}>🔍</span>
+          <input
+            className="scripts-search-input"
+            type="text"
+            placeholder="Search teleprompter scripts by keyword or topic..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: '12px' }}
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ── Main Structured Scripts Container ── */}
+      <main className="scripts-container">
         {loading && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-            <div className="panel skeleton" style={{ height: 100 }} />
-            <div className="panel skeleton" style={{ height: 100 }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className="panel skeleton" style={{ height: 140, borderRadius: 'var(--radius-xl)' }} />
+            <div className="panel skeleton" style={{ height: 140, borderRadius: 'var(--radius-xl)' }} />
           </div>
         )}
 
         {error && !loading && (
-          <div className="panel" style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
+          <div className="scripts-empty">
             <p style={{ color: 'var(--color-danger)' }}>{error}</p>
+            <Link href={`/events/${eventId}/live`} className="setup-btn--primary">
+              Return to Live Control Room
+            </Link>
           </div>
         )}
 
-        {!loading && !error && displayedScripts.length === 0 && (
-          <div className="panel" style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
-            <p style={{ color: 'var(--color-text-muted)', marginBottom: 'var(--space-4)' }}>
-              No scripts generated yet. Use the Live Dashboard to generate MC transition scripts or broadcast announcements.
+        {!loading && displayedScripts.length === 0 && (
+          <div className="scripts-empty">
+            <span className="scripts-empty-icon">🎙️</span>
+            <span style={{ fontSize: 'var(--text-md)', fontWeight: 600, color: 'var(--color-text-secondary)' }}>
+              {searchQuery ? 'No matching broadcast scripts found' : 'No teleprompter scripts generated yet'}
+            </span>
+            <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: 'var(--text-xs)', maxWidth: 480 }}>
+              {searchQuery
+                ? 'Try refining your search keyword or clearing the filter.'
+                : 'Open the Live Broadcast Control Room and press [G] to generate celebratory AI keynote speaker transitions or announcements on demand.'}
             </p>
-            <Link href={`/events/${eventId}/live`} className="btn btn--primary btn--sm">
-              Open Live Dashboard
+            <Link href={`/events/${eventId}/live`} className="scripts-launcher-btn" style={{ marginTop: '10px' }}>
+              <span className="scripts-launcher-beacon" />
+              <span>Launch Live Control Room</span>
+              <span>→</span>
             </Link>
           </div>
         )}
 
         {!loading && displayedScripts.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {displayedScripts.map((script) => {
               const isExpanded = expandedId === script.id;
+              const isSpeaking = speakingId === script.id;
               const { relative, absolute } = formatTimestamp(script.createdAt);
-              const preview = script.content.slice(0, 140) + (script.content.length > 140 ? '...' : '');
+              const { words, formatted: readTimeFormatted } = computeReadTime(script.content);
+
+              const preview =
+                script.content.length > 180
+                  ? script.content.slice(0, 180) + '...'
+                  : script.content;
 
               return (
-                <div
+                <article
                   key={script.id}
-                  className="card"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--space-3)',
-                    borderLeft: script.used ? '3px solid var(--color-border)' : '3px solid var(--color-accent)',
-                  }}
+                  className={`script-card ${isExpanded ? 'script-card--expanded' : ''}`}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                      <span className="badge badge--upcoming">
-                        {script.type}
+                  {/* Card Header with Badges and Actions */}
+                  <div className="script-card__header">
+                    <div className="script-card__badges">
+                      <span className={`script-type-tag ${script.type === 'ANNOUNCEMENT' ? 'script-type-tag--announcement' : 'script-type-tag--transition'}`}>
+                        {script.type === 'ANNOUNCEMENT' ? '📣 STAGE ANNOUNCEMENT' : '🎙️ MC TRANSITION'}
                       </span>
+
                       {script.used ? (
-                        <span className="badge badge--completed">Used</span>
+                        <span className="badge badge--completed">✓ Used On Stage</span>
                       ) : (
-                        <span className="badge badge--live">Ready</span>
+                        <span className="badge badge--live">● Broadcast Ready</span>
                       )}
-                      <span className="num" style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
+
+                      <span className="script-read-time num">
+                        ⏱️ {readTimeFormatted} · {words} Words
+                      </span>
+
+                      <span className="num" style={{ fontSize: '11px', color: 'var(--color-text-faint)' }}>
                         {relative} ({absolute})
                       </span>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                    <div className="script-card__actions">
+                      {/* Humanized Professional Read Aloud Button */}
+                      <button
+                        className={`script-action-btn ${isSpeaking ? 'script-action-btn--audio' : ''}`}
+                        onClick={() => handleAudioToggle(script.id, script.content)}
+                        title="Listen to humanized professional presenter audio playback"
+                      >
+                        {isSpeaking ? (
+                          <>
+                            <span className="script-audio-eq">
+                              <span /><span /><span />
+                            </span>
+                            <span>⏹️ Stop Audio</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>🔊</span>
+                            <span>Read Aloud</span>
+                          </>
+                        )}
+                      </button>
+
+                      {/* Copy Script */}
+                      <button
+                        className="script-action-btn"
+                        onClick={() => handleCopy(script.id, script.content)}
+                        title="Copy script to clipboard"
+                      >
+                        <span>{copiedId === script.id ? '✓ Copied' : '📋 Copy'}</span>
+                      </button>
+
+                      {/* Mark Used */}
                       {!script.used && (
                         <button
-                          className="btn btn--ghost btn--sm"
+                          className="script-action-btn"
                           onClick={() => markScriptUsed(script.id)}
+                          title="Mark this script as delivered on stage"
                         >
-                          Mark Used
+                          <span>✓ Mark Used</span>
                         </button>
                       )}
+
+                      {/* Modernized Teleprompter HUD Button (replaces boring Expand/Collapse) */}
                       <button
-                        className="btn btn--ghost btn--sm"
-                        onClick={() => handleCopy(script.id, script.content)}
-                      >
-                        {copiedId === script.id ? 'Copied ✓' : 'Copy'}
-                      </button>
-                      <button
-                        className="btn btn--ghost btn--sm"
+                        className="script-action-btn script-action-btn--prompter"
                         onClick={() => setExpandedId(isExpanded ? null : script.id)}
+                        title={isExpanded ? 'Minimize Teleprompter HUD' : 'Open Full Teleprompter HUD View'}
                       >
-                        {isExpanded ? 'Collapse ▲' : 'Expand ▼'}
+                        <span>{isExpanded ? '▲ Exit Prompter HUD' : '⚡ Teleprompter HUD ▼'}</span>
                       </button>
                     </div>
                   </div>
 
-                  <div
-                    style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: 'var(--text-sm)',
-                      lineHeight: 1.6,
-                      color: 'var(--color-text)',
-                      whiteSpace: isExpanded ? 'pre-wrap' : 'normal',
-                    }}
-                  >
-                    {isExpanded ? script.content : preview}
+                  {/* Card Body & Teleprompter Text Display */}
+                  <div className="script-card__body">
+                    {isExpanded ? (
+                      <div className="script-text--prompter">
+                        <div className="script-prompter-guide">
+                          <span className="script-prompter-label">● STAGE TELEPROMPTER ACTIVE</span>
+                          <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
+                            EST. PACE: 135 WPM · KEYNOTE POLISH
+                          </span>
+                        </div>
+                        <div style={{ whiteSpace: 'pre-wrap' }}>
+                          {script.content}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="script-text">
+                        {preview}
+                      </div>
+                    )}
                   </div>
-                </div>
+                </article>
               );
             })}
           </div>
