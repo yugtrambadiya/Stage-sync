@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { eventsApi, speakersApi, agendaApi, ApiRequestError } from '@/lib/api';
+import { UnifiedEventHeader } from '@/components/UnifiedEventHeader/UnifiedEventHeader';
 import type { Event, Speaker, AgendaItem } from '@/lib/types';
 import './setup.css';
 
@@ -37,6 +38,7 @@ function getTrackCategory(title: string): { label: string; tone: string } {
 
 export default function EventSetupPage() {
   const params = useParams();
+  const router = useRouter();
   const eventId = typeof params?.id === 'string' ? params.id : '';
 
   const [event, setEvent] = useState<Event | null>(null);
@@ -44,6 +46,25 @@ export default function EventSetupPage() {
   const [agenda, setAgenda] = useState<AgendaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Keyboard shortcut: Press L to jump straight to Live Control Room
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLSelectElement
+      ) {
+        return;
+      }
+      if (e.key === 'l' || e.key === 'L') {
+        e.preventDefault();
+        router.push(`/events/${eventId}/live`);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [eventId, router]);
 
   // View state & search
   const [activeTab, setActiveTab] = useState<'SPLIT' | 'AGENDA' | 'SPEAKERS'>('SPLIT');
@@ -223,42 +244,12 @@ export default function EventSetupPage() {
 
   return (
     <div className="setup-studio">
-      {/* ── Single Unified Frosted Glass Header ── */}
-      <header className="setup-header">
-        <div className="setup-header__left">
-          <Link href="/events" className="setup-header__brand">
-            <span className="setup-header__logo-dot" />
-            <span className="setup-header__logo-text">
-              STAGE<span style={{ color: 'var(--color-accent)' }}>SYNC</span>
-            </span>
-          </Link>
-          <span className="setup-header__sep">/</span>
-          <span className="setup-header__event-tag" title={event?.name ?? 'Event Setup'}>
-            {event?.name ?? 'Event Architecture'}
-          </span>
-        </div>
-
-        {/* Center Segmented Navigation Pills */}
-        <nav className="setup-header__nav" aria-label="Event views">
-          <Link href={`/events/${eventId}/live`} className="setup-header__tab">
-            Live Stage
-          </Link>
-          <Link href={`/events/${eventId}/setup`} className="setup-header__tab setup-header__tab--active">
-            Setup & Agenda
-          </Link>
-          <Link href={`/events/${eventId}/scripts`} className="setup-header__tab">
-            AI Scripts
-          </Link>
-        </nav>
-
-        {/* Right Action */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <Link href={`/events/${eventId}/live`} className="setup-btn--live-launch">
-            <span>● Launch Live Control Room</span>
-            <span>→</span>
-          </Link>
-        </div>
-      </header>
+      {/* ── Multi-Billion Company Unified Enterprise Header ── */}
+      <UnifiedEventHeader
+        eventId={eventId}
+        eventName={event?.name}
+        activeView="setup"
+      />
 
       {/* ── Breathable Hero Header ── */}
       <section className="setup-hero">

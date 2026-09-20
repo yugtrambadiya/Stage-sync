@@ -16,6 +16,7 @@ import { NextUpCard } from '@/components/NextUpCard/NextUpCard';
 import { AgendaTimeline } from '@/components/AgendaTimeline/AgendaTimeline';
 import { ScriptModal } from '@/components/ScriptModal/ScriptModal';
 import { DelayModal } from '@/components/DelayModal/DelayModal';
+import { UnifiedEventHeader } from '@/components/UnifiedEventHeader/UnifiedEventHeader';
 
 function formatClock(d: Date): string {
   return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
@@ -185,218 +186,70 @@ export default function LiveDashboardPage() {
   }, [currentSession, nextSession, agenda]);
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--color-bg)' }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: '#06070a',
+        backgroundImage: `
+          radial-gradient(ellipse 70% 45% at 50% -15%, rgba(99, 102, 241, 0.16) 0%, transparent 60%),
+          radial-gradient(ellipse 55% 35% at 92% 15%, rgba(16, 185, 129, 0.09) 0%, transparent 50%),
+          radial-gradient(ellipse 45% 30% at 8% 45%, rgba(245, 158, 11, 0.06) 0%, transparent 45%),
+          radial-gradient(circle 800px at 50% 100%, rgba(15, 23, 42, 0.45) 0%, transparent 100%)
+        `,
+        backgroundAttachment: 'fixed',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
       {/* Toast Stack */}
       <AnnouncementToast />
 
-      {/* Unified Broadcast Header */}
-      <header
-        style={{
-          height: '60px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 var(--space-6)',
-          background: 'rgba(13, 17, 23, 0.85)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          borderBottom: '1px solid var(--color-border)',
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
-        }}
-      >
-        {/* Left: Brand + Back + Event Title */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-          <Link
-            href="/events"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '32px',
-              height: '32px',
-              borderRadius: 'var(--radius-sm)',
-              background: 'rgba(255, 255, 255, 0.04)',
-              border: '1px solid var(--color-border)',
-              color: 'var(--color-text-muted)',
-              textDecoration: 'none',
-              fontSize: 'var(--text-sm)',
-              transition: 'all var(--dur-fast)',
-            }}
-            title="Return to Events Directory"
-          >
-            ←
-          </Link>
+      {/* Multi-Billion Company Unified Enterprise Header */}
+      <UnifiedEventHeader
+        eventId={eventId}
+        eventName={event?.name}
+        activeView="live"
+        extraRightActions={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {/* Drift Chip */}
+            {totalDriftMinutes > 0 ? (
+              <span className="badge badge--delayed" style={{ fontSize: '11px', padding: '3px 9px' }} title="Schedule is running behind">
+                +{totalDriftMinutes}M DRIFT
+              </span>
+            ) : (
+              <span className="badge badge--live" style={{ fontSize: '11px', padding: '3px 9px' }} title="Schedule running strictly on time">
+                ON TIME
+              </span>
+            )}
 
-          <Link href="/events" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '7px' }}>
-            <span
-              style={{
-                display: 'inline-block',
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                background: 'var(--color-accent)',
-                boxShadow: '0 0 10px var(--color-accent)',
-              }}
-            />
-            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, letterSpacing: '0.08em', fontSize: 'var(--text-sm)' }}>
-              STAGE<span style={{ color: 'var(--color-accent)' }}>SYNC</span>
-            </span>
-          </Link>
+            <div style={{ width: '1px', height: '16px', background: 'var(--color-border)' }} />
 
-          <span style={{ color: 'var(--color-border)', margin: '0 2px' }}>/</span>
+            {/* Log drawer button */}
+            <button
+              className={`btn btn--sm ${showLogDrawer ? 'btn--secondary' : 'btn--ghost'}`}
+              onClick={() => setShowLogDrawer((d) => !d)}
+              style={{ fontSize: 'var(--text-xs)', padding: '5px 10px', height: 'auto' }}
+              title="Toggle Live Broadcast Log"
+            >
+              📋 Log {activityLog.length > 0 && `(${activityLog.length})`}
+            </button>
 
-          <span
-            style={{
-              fontSize: 'var(--text-xs)',
-              fontWeight: 600,
-              color: 'var(--color-text)',
-              maxWidth: 240,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              padding: '4px 10px',
-              borderRadius: 'var(--radius-pill)',
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid var(--color-border)',
-            }}
-            title={event?.name ?? 'Live Control Room'}
-          >
-            {event?.name ?? 'Live Stage'}
-          </span>
-        </div>
+            {/* Reset button */}
+            <button
+              className="btn btn--ghost btn--sm"
+              onClick={handleResetDemo}
+              style={{ fontSize: 'var(--text-xs)', padding: '5px 10px', height: 'auto', color: 'var(--color-text-muted)' }}
+              title="Restore default demo schedule"
+            >
+              ↺ Reset
+            </button>
 
-        {/* Center: Segmented Navigation Pills */}
-        <nav
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            background: 'rgba(255, 255, 255, 0.03)',
-            padding: '4px',
-            borderRadius: 'var(--radius-pill)',
-            border: '1px solid var(--color-border)',
-          }}
-          aria-label="Event views"
-        >
-          <Link
-            href={`/events/${eventId}/live`}
-            style={{
-              padding: '5px 14px',
-              fontSize: 'var(--text-xs)',
-              fontWeight: 600,
-              color: 'var(--color-accent)',
-              background: 'var(--color-accent-glow)',
-              borderRadius: 'var(--radius-pill)',
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            <span
-              style={{
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                background: 'var(--color-live)',
-                boxShadow: '0 0 8px var(--color-live)',
-              }}
-            />
-            Live Stage
-          </Link>
-
-          <Link
-            href={`/events/${eventId}/setup`}
-            style={{
-              padding: '5px 14px',
-              fontSize: 'var(--text-xs)',
-              fontWeight: 500,
-              color: 'var(--color-text-muted)',
-              borderRadius: 'var(--radius-pill)',
-              textDecoration: 'none',
-              transition: 'all var(--dur-fast)',
-            }}
-          >
-            Setup & Agenda
-          </Link>
-
-          <Link
-            href={`/events/${eventId}/scripts`}
-            style={{
-              padding: '5px 14px',
-              fontSize: 'var(--text-xs)',
-              fontWeight: 500,
-              color: 'var(--color-text-muted)',
-              borderRadius: 'var(--radius-pill)',
-              textDecoration: 'none',
-              transition: 'all var(--dur-fast)',
-            }}
-          >
-            AI Scripts
-          </Link>
-        </nav>
-
-        {/* Right: Telemetry & Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-          {/* Monospace Clock Pill */}
-          <div
-            className="num"
-            suppressHydrationWarning
-            style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: 'var(--text-xs)',
-              fontWeight: 700,
-              letterSpacing: '0.06em',
-              background: 'rgba(255, 255, 255, 0.04)',
-              padding: '5px 11px',
-              borderRadius: 'var(--radius-pill)',
-              border: '1px solid var(--color-border)',
-              color: 'var(--color-text)',
-            }}
-            title="Master Broadcast Wall Clock"
-          >
-            {mounted ? formatClock(now) : '--:--:--'}
+            {/* Realtime LiveSync pill */}
+            <LiveStatusPill status={connStatus} lastSyncedAt={lastSyncedAt} />
           </div>
-
-          {/* Drift Chip */}
-          {totalDriftMinutes > 0 ? (
-            <span className="badge badge--delayed" style={{ fontSize: '11px', padding: '3px 9px' }} title="Schedule is running behind">
-              +{totalDriftMinutes}M DRIFT
-            </span>
-          ) : (
-            <span className="badge badge--live" style={{ fontSize: '11px', padding: '3px 9px' }} title="Schedule running strictly on time">
-              ON TIME
-            </span>
-          )}
-
-          <div style={{ width: '1px', height: '16px', background: 'var(--color-border)' }} />
-
-          {/* Log button */}
-          <button
-            className={`btn btn--sm ${showLogDrawer ? 'btn--secondary' : 'btn--ghost'}`}
-            onClick={() => setShowLogDrawer((d) => !d)}
-            style={{ fontSize: 'var(--text-xs)', padding: '5px 10px', height: 'auto' }}
-            title="Toggle Live Broadcast Log"
-          >
-            📋 Log {activityLog.length > 0 && `(${activityLog.length})`}
-          </button>
-
-          {/* Reset button */}
-          <button
-            className="btn btn--ghost btn--sm"
-            onClick={handleResetDemo}
-            style={{ fontSize: 'var(--text-xs)', padding: '5px 10px', height: 'auto', color: 'var(--color-text-muted)' }}
-            title="Restore default demo schedule"
-          >
-            ↺ Reset
-          </button>
-
-          {/* Realtime LiveSync pill */}
-          <LiveStatusPill status={connStatus} lastSyncedAt={lastSyncedAt} />
-        </div>
-      </header>
+        }
+      />
 
       {/* Main Content Layout */}
       <main

@@ -5,7 +5,15 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { eventsApi } from '@/lib/api';
 import { useStageStore } from '@/store/useStageStore';
-import { speakBroadcastScript, stopBroadcastSpeech } from '@/lib/speech';
+import {
+  speakBroadcastScript,
+  stopBroadcastSpeech,
+  getAvailablePresenterVoices,
+  getBestBroadcastVoice,
+  prepareScriptSentences,
+  type PresenterVoice,
+} from '@/lib/speech';
+import { UnifiedEventHeader } from '@/components/UnifiedEventHeader/UnifiedEventHeader';
 import type { Event, Script } from '@/lib/types';
 import './scripts.css';
 
@@ -80,13 +88,23 @@ export default function EventScriptsPage() {
   // Interactive Card State (first script in Teleprompter HUD by default for immediate preview)
   const [expandedId, setExpandedId] = useState<string | null>('scr-demo-1');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [prompterFontSize, setPrompterFontSize] = useState<number>(18);
+
+  // High-End Speech Synthesis State
   const [speakingId, setSpeakingId] = useState<string | null>(null);
+  const [speakingSentenceIndex, setSpeakingSentenceIndex] = useState<number>(-1);
+  const [speakingTotalSentences, setSpeakingTotalSentences] = useState<number>(0);
+  const [availableVoices, setAvailableVoices] = useState<PresenterVoice[]>([]);
+  const [selectedVoiceName, setSelectedVoiceName] = useState<string>('');
+  const [speechRate, setSpeechRate] = useState<number>(0.91);
+  const [isVoicePickerOpen, setIsVoicePickerOpen] = useState(false);
 
   // Store scripts
   const storeScripts = useStageStore((s) => s.scripts);
   const addScript = useStageStore((s) => s.addScript);
   const markScriptUsed = useStageStore((s) => s.markScriptUsed);
 
+  // Load Event
   useEffect(() => {
     if (!eventId) return;
     setLoading(true);
@@ -109,6 +127,24 @@ export default function EventScriptsPage() {
       DEFAULT_SCRIPTS.forEach((sc) => addScript({ ...sc, eventId }));
     }
   }, [storeScripts.length, eventId, addScript]);
+
+  // Load and refresh speech voices
+  useEffect(() => {
+    const refreshVoices = () => {
+      const voices = getAvailablePresenterVoices();
+      setAvailableVoices(voices);
+      if (voices.length > 0 && !selectedVoiceName) {
+        const best = getBestBroadcastVoice();
+        if (best) setSelectedVoiceName(best.name);
+      }
+    };
+
+    refreshVoices();
+
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = refreshVoices;
+    }
+  }, [selectedVoiceName]);
 
   // Keyboard shortcut: Press L to jump straight to Live Control Room
   useEffect(() => {
@@ -185,74 +221,65 @@ export default function EventScriptsPage() {
     if (speakingId === id) {
       stopBroadcastSpeech();
       setSpeakingId(null);
+      setSpeakingSentenceIndex(-1);
     } else {
       setSpeakingId(id);
-      speakBroadcastScript(
-        text,
-        () => setSpeakingId(null),
-        () => setSpeakingId(null)
-      );
+      setSpeakingSentenceIndex(0);
+      speakBroadcastScript(text, {
+        voiceName: selectedVoiceName || undefined,
+        rate: speechRate,
+        onSentenceChange: (idx, total) => {
+          setSpeakingSentenceIndex(idx);
+          setSpeakingTotalSentences(total);
+        },
+        onEnd: () => {
+          setSpeakingId(null);
+          setSpeakingSentenceIndex(-1);
+        },
+        onError: () => {
+          setSpeakingId(null);
+          setSpeakingSentenceIndex(-1);
+        },
+      });
     }
-  }, [speakingId]);
+  }, [speakingId, selectedVoiceName, speechRate]);
+
+  const handleTestVoice = useCallback(() => {
+    speakBroadcastScript(
+      "Welcome to the keynote broadcast. Voice engine is calibrated and natural speech synthesis is active.",
+      {
+        voiceName: selectedVoiceName || undefined,
+        rate: speechRate,
+      }
+    );
+  }, [selectedVoiceName, speechRate]);
+
+  const activeVoiceObj = useMemo(() => {
+    return availableVoices.find((v) => v.name === selectedVoiceName) || availableVoices[0];
+  }, [availableVoices, selectedVoiceName]);
 
   return (
     <div className="scripts-studio">
-      {/* ── Unified Frosted Glass Header ── */}
-      <header className="scripts-header">
-        <div className="scripts-header__left">
-          <Link href="/events" className="scripts-header__brand">
-            <span className="scripts-header__logo-dot" />
-            <span className="scripts-header__logo-text">
-              STAGE<span style={{ color: 'var(--color-accent)' }}>SYNC</span>
-            </span>
-          </Link>
-          <span className="scripts-header__sep">/</span>
-          <span className="scripts-header__event-tag" title={event?.name ?? 'Scripts Studio'}>
-            {event?.name ?? 'Live Scripts Studio'}
-          </span>
-        </div>
+      {/* ── Multi-Billion Company Unified Enterprise Header ── */}
+      <UnifiedEventHeader
+        eventId={eventId}
+        eventName={event?.name}
+        activeView="scripts"
+      />
 
-        {/* Center Segmented Navigation */}
-        <nav className="scripts-header__nav" aria-label="Event views">
-          <Link href={`/events/${eventId}/live`} className="scripts-header__tab">
-            Live Stage
-          </Link>
-          <Link href={`/events/${eventId}/setup`} className="scripts-header__tab">
-            Setup & Agenda
-          </Link>
-          <Link href={`/events/${eventId}/scripts`} className="scripts-header__tab scripts-header__tab--active">
-            AI Scripts
-          </Link>
-        </nav>
-
-        {/* Next-To-Next Level Live Control Room Launcher */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <Link
-            href={`/events/${eventId}/live`}
-            className="scripts-launcher-btn"
-            title="Launch Live Broadcast Control Room (Hotkey: L)"
-          >
-            <span className="scripts-launcher-beacon" />
-            <span>● Launch Live Control Room</span>
-            <span className="scripts-launcher-kbd">L</span>
-            <span>→</span>
-          </Link>
-        </div>
-      </header>
-
-      {/* ── Hero Studio Section ── */}
+      {/* ── Studio Hero Section ── */}
       <section className="scripts-hero">
         <div className="scripts-hero__top">
           <div>
             <div className="scripts-hero__meta">
               <span className="scripts-hero__beacon" />
-              <span className="scripts-hero__eyebrow">AI Teleprompter & Speech Intelligence</span>
+              <span className="scripts-hero__eyebrow">ENTERPRISE TELEPROMPTER & SPEECH INTELLIGENCE</span>
             </div>
             <h1 className="scripts-hero__title">
               AI Broadcast Scripts Archive
             </h1>
             <p className="scripts-hero__desc">
-              All stage teleprompter scripts, announcements, and transitions generated during this event. Audio playback powered by humanized keynote voice synthesis.
+              Executive teleprompter scripts, stage introductions, and keynote transitions. Featuring ultra-humanized voice synthesis with deliberate keynote cadence and live sentence tracking.
             </p>
           </div>
 
@@ -260,15 +287,15 @@ export default function EventScriptsPage() {
             <Link
               href={`/events/${eventId}/live`}
               className="setup-btn--primary"
-              style={{ padding: '9px 18px' }}
+              style={{ padding: '9px 18px', textDecoration: 'none' }}
             >
-              <span>✨ Generate New in Control Room</span>
+              <span>✨ Generate in Live Control Room</span>
               <span>→</span>
             </Link>
           </div>
         </div>
 
-        {/* ── 4 Executive Metrics ── */}
+        {/* ── 4 Executive Studio Metrics & Voice Selector Card ── */}
         <div className="scripts-metrics">
           <div className="scripts-metric-card">
             <div className="scripts-metric-icon">📜</div>
@@ -291,24 +318,177 @@ export default function EventScriptsPage() {
           <div className="scripts-metric-card">
             <div className="scripts-metric-icon">⏱️</div>
             <div className="scripts-metric-content">
-              <span className="scripts-metric-label">Total Prompter Cadence</span>
-              <span className="scripts-metric-value num">{totalReadFormatted}</span>
+              <span className="scripts-metric-label">Prompter Cadence</span>
+              <span className="scripts-metric-value num">{totalReadFormatted} · 135 WPM</span>
             </div>
           </div>
 
-          <div className="scripts-metric-card">
+          {/* Voice Synthesizer Interactive Engine Selector */}
+          <div
+            className="scripts-metric-card"
+            style={{
+              cursor: 'pointer',
+              border: '1px solid rgba(99, 102, 241, 0.3)',
+              background: 'rgba(99, 102, 241, 0.08)',
+              position: 'relative',
+            }}
+            onClick={() => setIsVoicePickerOpen(!isVoicePickerOpen)}
+            title="Configure humanized broadcast presenter voice"
+          >
             <div className="scripts-metric-icon" style={{ color: 'var(--color-accent)' }}>🎙️</div>
-            <div className="scripts-metric-content">
-              <span className="scripts-metric-label">Voice Synthesizer</span>
-              <span className="scripts-metric-value" style={{ color: 'var(--color-accent)', fontSize: '13px' }}>
-                NEURAL MC VOICE
+            <div className="scripts-metric-content" style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+                <span className="scripts-metric-label">Voice Engine</span>
+                <span
+                  style={{
+                    fontSize: '10px',
+                    fontWeight: 700,
+                    padding: '1px 6px',
+                    borderRadius: '4px',
+                    background: activeVoiceObj?.tier === 'neural' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(99, 102, 241, 0.2)',
+                    color: activeVoiceObj?.tier === 'neural' ? '#34d399' : '#a5b4fc',
+                  }}
+                >
+                  {activeVoiceObj?.tier === 'neural' ? '⚡ NEURAL' : '🎙️ HD STUDIO'}
+                </span>
+              </div>
+              <span
+                className="scripts-metric-value"
+                style={{
+                  color: 'var(--color-text)',
+                  fontSize: '13px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                }}
+              >
+                {activeVoiceObj ? activeVoiceObj.name : 'Humanized Keynote'}
+                <span style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>▾</span>
               </span>
             </div>
           </div>
         </div>
+
+        {/* Expandable Voice Engine Customizer Drawer */}
+        {isVoicePickerOpen && (
+          <div
+            style={{
+              marginTop: '16px',
+              padding: '18px 22px',
+              background: 'rgba(10, 14, 24, 0.95)',
+              border: '1px solid rgba(99, 102, 241, 0.35)',
+              borderRadius: 'var(--radius-lg)',
+              boxShadow: '0 16px 36px rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '20px',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              animation: 'cascade-enter var(--dur-fast) var(--ease-out)',
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: '1 1 300px' }}>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: '#f8fafc', letterSpacing: '0.04em' }}>
+                SELECT BROADCAST PRESENTER VOICE PERSONA
+              </span>
+              <p style={{ margin: 0, fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                StageSync prioritizes natural neural & high-definition voices for humanized speech inflection and cadence.
+              </p>
+              <select
+                className="select"
+                style={{ marginTop: '4px', maxWidth: 420 }}
+                value={selectedVoiceName}
+                onChange={(e) => {
+                  setSelectedVoiceName(e.target.value);
+                  try {
+                    localStorage.setItem('stagesync_preferred_voice', e.target.value);
+                  } catch {
+                    // ignore
+                  }
+                }}
+              >
+                {availableVoices.map((v) => (
+                  <option key={v.id} value={v.name}>
+                    {v.label} ({v.lang})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text-muted)' }}>
+                  PRESENTER CADENCE
+                </span>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  {[
+                    { label: 'Deliberate (0.86x)', val: 0.86 },
+                    { label: 'Keynote Polish (0.91x)', val: 0.91 },
+                    { label: 'Standard (1.0x)', val: 1.0 },
+                  ].map((s) => (
+                    <button
+                      key={s.val}
+                      onClick={() => setSpeechRate(s.val)}
+                      style={{
+                        padding: '5px 10px',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        borderRadius: 'var(--radius-sm)',
+                        background: speechRate === s.val ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.05)',
+                        color: speechRate === s.val ? '#fff' : 'var(--color-text-secondary)',
+                        border: '1px solid var(--color-border)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                onClick={handleTestVoice}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: 'var(--radius-pill)',
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  border: '1px solid rgba(16, 185, 129, 0.4)',
+                  color: '#34d399',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <span>🔊</span>
+                <span>Test Voice Sample</span>
+              </button>
+
+              <button
+                onClick={() => setIsVoicePickerOpen(false)}
+                style={{
+                  padding: '8px 14px',
+                  borderRadius: 'var(--radius-pill)',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid var(--color-border)',
+                  color: 'var(--color-text-secondary)',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                }}
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        )}
       </section>
 
-      {/* ── Controls & Filter Bar ── */}
+      {/* ── Controls & Search Bar ── */}
       <div className="scripts-controls">
         <div className="scripts-filter-pills" role="tablist">
           {(['ALL', 'TRANSITION', 'ANNOUNCEMENT'] as const).map((t) => (
@@ -327,7 +507,7 @@ export default function EventScriptsPage() {
           <input
             className="scripts-search-input"
             type="text"
-            placeholder="Search teleprompter scripts by keyword or topic..."
+            placeholder="Search teleprompter scripts by keyword, topic, or speaker..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -386,6 +566,7 @@ export default function EventScriptsPage() {
               const isSpeaking = speakingId === script.id;
               const { relative, absolute } = formatTimestamp(script.createdAt);
               const { words, formatted: readTimeFormatted } = computeReadTime(script.content);
+              const sentences = prepareScriptSentences(script.content);
 
               const preview =
                 script.content.length > 180
@@ -432,6 +613,11 @@ export default function EventScriptsPage() {
                               <span /><span /><span />
                             </span>
                             <span>⏹️ Stop Audio</span>
+                            {speakingSentenceIndex >= 0 && (
+                              <span style={{ fontSize: '10px', opacity: 0.8, fontFamily: 'var(--font-mono)' }}>
+                                ({speakingSentenceIndex + 1}/{speakingTotalSentences})
+                              </span>
+                            )}
                           </>
                         ) : (
                           <>
@@ -461,7 +647,7 @@ export default function EventScriptsPage() {
                         </button>
                       )}
 
-                      {/* Modernized Teleprompter HUD Button (replaces boring Expand/Collapse) */}
+                      {/* Modernized Teleprompter HUD Button */}
                       <button
                         className="script-action-btn script-action-btn--prompter"
                         onClick={() => setExpandedId(isExpanded ? null : script.id)}
@@ -477,13 +663,81 @@ export default function EventScriptsPage() {
                     {isExpanded ? (
                       <div className="script-text--prompter">
                         <div className="script-prompter-guide">
-                          <span className="script-prompter-label">● STAGE TELEPROMPTER ACTIVE</span>
-                          <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-                            EST. PACE: 135 WPM · KEYNOTE POLISH
-                          </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <span className="script-prompter-label">● STAGE TELEPROMPTER ACTIVE</span>
+                            <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
+                              EST. PACE: 135 WPM · KEYNOTE POLISH
+                            </span>
+                          </div>
+
+                          {/* Prompter Font Size Controls */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>Font:</span>
+                            <button
+                              onClick={() => setPrompterFontSize((s) => Math.max(14, s - 2))}
+                              style={{
+                                background: 'rgba(255, 255, 255, 0.06)',
+                                border: '1px solid var(--color-border)',
+                                color: 'var(--color-text-secondary)',
+                                borderRadius: '4px',
+                                padding: '2px 6px',
+                                fontSize: '11px',
+                                cursor: 'pointer',
+                              }}
+                              title="Decrease font size"
+                            >
+                              Aa-
+                            </button>
+                            <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', minWidth: 26, textAlign: 'center' }}>
+                              {prompterFontSize}px
+                            </span>
+                            <button
+                              onClick={() => setPrompterFontSize((s) => Math.min(32, s + 2))}
+                              style={{
+                                background: 'rgba(255, 255, 255, 0.06)',
+                                border: '1px solid var(--color-border)',
+                                color: 'var(--color-text-secondary)',
+                                borderRadius: '4px',
+                                padding: '2px 6px',
+                                fontSize: '11px',
+                                cursor: 'pointer',
+                              }}
+                              title="Increase font size"
+                            >
+                              Aa+
+                            </button>
+                          </div>
                         </div>
-                        <div style={{ whiteSpace: 'pre-wrap' }}>
-                          {script.content}
+
+                        {/* Sentence by sentence display with active sentence highlight during speech playback */}
+                        <div
+                          style={{
+                            fontSize: `${prompterFontSize}px`,
+                            lineHeight: 1.8,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '12px',
+                          }}
+                        >
+                          {sentences.map((sent, sIdx) => {
+                            const isCurrent = isSpeaking && speakingSentenceIndex === sIdx;
+                            return (
+                              <span
+                                key={sIdx}
+                                style={{
+                                  padding: isCurrent ? '8px 12px' : '2px 0',
+                                  borderRadius: 'var(--radius-sm)',
+                                  background: isCurrent ? 'rgba(245, 158, 11, 0.16)' : 'transparent',
+                                  borderLeft: isCurrent ? '3px solid #f59e0b' : '3px solid transparent',
+                                  color: isCurrent ? '#fef08a' : isSpeaking ? 'rgba(241, 245, 249, 0.65)' : '#f1f5f9',
+                                  boxShadow: isCurrent ? '0 0 20px rgba(245, 158, 11, 0.2)' : 'none',
+                                  transition: 'all 0.2s ease',
+                                }}
+                              >
+                                {sent}{' '}
+                              </span>
+                            );
+                          })}
                         </div>
                       </div>
                     ) : (
