@@ -2,6 +2,7 @@ import { Module, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
 import { HealthController } from './health.controller';
+import { AuthModule } from './modules/auth/auth.module';
 import { EventsModule } from './modules/events/events.module';
 import { SpeakersModule } from './modules/speakers/speakers.module';
 import { AgendaModule } from './modules/agenda/agenda.module';
@@ -22,6 +23,8 @@ import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
     // Global infrastructure
     PrismaModule,
     ScheduleEventsModule,
+    // Authentication (provides global JWT guard)
+    AuthModule,
     // Feature modules
     EventsModule,
     SpeakersModule,

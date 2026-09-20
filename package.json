@@ -18,5 +18,9 @@
   },
   "devDependencies": {
     "prettier": "^3.6.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["bcrypt", "@scarf/scarf"],
+    "ignoredBuiltDependencies": []
   }
 }

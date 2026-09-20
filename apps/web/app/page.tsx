@@ -34,8 +34,8 @@ export default function HomePage() {
               </p>
 
               <div className="landing__ctas">
-                <Link href="/events" className="btn btn--primary btn--lg">
-                  Open Control Room
+                <Link href="/auth/login" className="btn btn--primary btn--lg">
+                  Get Started
                 </Link>
                 <a href="#features" className="btn btn--ghost btn--lg">
                   See how it works

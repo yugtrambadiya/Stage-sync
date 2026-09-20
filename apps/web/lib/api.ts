@@ -1,6 +1,7 @@
 /* ─── StageSync API Layer ──────────────────────────────────────────────────
    Single typed fetch wrapper. All backend calls go through here.
    Base URL from NEXT_PUBLIC_API_URL env var.
+   Automatically injects JWT Authorization header from auth tokens.
    ─────────────────────────────────────────────────────────────────────────── */
 
 import type {
@@ -15,6 +16,7 @@ import type {
   TransitionResponse,
   ApiError,
 } from './types';
+import { getToken, clearToken } from './auth';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
 
@@ -45,14 +47,33 @@ async function request<T>(
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
+    // Auto-inject JWT token if available
+    const token = getToken();
+    const authHeaders: Record<string, string> = token
+      ? { Authorization: `Bearer ${token}` }
+      : {};
+
     const res = await fetch(`${BASE}${path}`, {
       ...fetchOptions,
       signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
+        ...authHeaders,
         ...fetchOptions.headers,
       },
     });
+
+    // Handle 401 — clear stale token and redirect to login
+    if (res.status === 401 && typeof window !== 'undefined') {
+      clearToken();
+      window.location.href = '/auth/login';
+      throw new ApiRequestError({
+        statusCode: 401,
+        error: 'Unauthorized',
+        code: 'UNAUTHORIZED',
+        message: 'Session expired. Redirecting to login.',
+      });
+    }
 
     if (!res.ok) {
       let body: ApiError;
