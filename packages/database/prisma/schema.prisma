@@ -7,48 +7,89 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ── Authentication ───────────────────────────────────────────────────────────
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String?
+  avatarUrl        String?
+  passwordHash     String?
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  accounts         Account[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Account {
+  id                String @id @default(cuid())
+  userId            String
+  provider          String   // "google" | "credentials"
+  providerAccountId String   // Google sub ID or email
+  accessToken       String?
+  refreshToken      String?
+  user              User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+// ── Domain Models ────────────────────────────────────────────────────────────
 model Event {
-  id          String          @id @default(cuid())
+  id          String           @id @default(cuid())
   name        String
   description String?
   venue       String?
   date        DateTime
-  timezone    String          @default("Asia/Kolkata")
-  status      EventStatus     @default(DRAFT)
+  timezone    String           @default("Asia/Kolkata")
+  status      EventStatus      @default(DRAFT)
   agendaItems AgendaItem[]
   speakers    Speaker[]
   scripts     Script[]
   changes     ScheduleChange[]
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 }
 
 model Speaker {
-  id           String       @id @default(cuid())
+  id           String              @id @default(cuid())
   eventId      String
   name         String
   designation  String?
   organization String?
   biography    String?
   expertise    String[]
-  event        Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event        Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
   agendaItems  AgendaItem[]
-  createdAt    DateTime     @default(now())
+  panelSlots   AgendaItemSpeaker[]
+  createdAt    DateTime            @default(now())
 }
 
 model AgendaItem {
-  id              String       @id @default(cuid())
+  id              String              @id @default(cuid())
   eventId         String
   speakerId       String?
   title           String
   description     String?
   startTime       DateTime
   durationMinutes Int
-  status          AgendaStatus @default(UPCOMING)
-  event           Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  speaker         Speaker?     @relation(fields: [speakerId], references: [id])
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  status          AgendaStatus        @default(UPCOMING)
+  event           Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  speaker         Speaker?            @relation(fields: [speakerId], references: [id])
+  panelSpeakers   AgendaItemSpeaker[]
+  scheduleChanges ScheduleChange[]
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+}
+
+/// Join table for multi-speaker panels — additive, keeps existing speakerId FK intact
+model AgendaItemSpeaker {
+  agendaItemId String
+  speakerId    String
+  role         String?    @default("PANELIST")
+  agendaItem   AgendaItem @relation(fields: [agendaItemId], references: [id], onDelete: Cascade)
+  speaker      Speaker    @relation(fields: [speakerId], references: [id], onDelete: Cascade)
+
+  @@id([agendaItemId, speakerId])
 }
 
 model Script {
@@ -63,14 +104,21 @@ model Script {
 }
 
 model ScheduleChange {
-  id        String   @id @default(cuid())
-  eventId   String
-  reason    String
-  oldStart  DateTime?
-  newStart  DateTime?
-  approved  Boolean  @default(false)
-  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  id           String      @id @default(cuid())
+  eventId      String
+  agendaItemId String?
+  batchId      String?
+  changeType   String      @default("DELAY")
+  delayMinutes Int?
+  reason       String
+  oldStart     DateTime?
+  newStart     DateTime?
+  oldEnd       DateTime?
+  newEnd       DateTime?
+  approved     Boolean     @default(false)
+  event        Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  agendaItem   AgendaItem? @relation(fields: [agendaItemId], references: [id])
+  createdAt    DateTime    @default(now())
 }
 
 enum EventStatus {

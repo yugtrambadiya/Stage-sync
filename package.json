@@ -11,9 +11,16 @@
     "test": "pnpm -r test",
     "db:generate": "pnpm --filter @smart-anchor/database prisma generate",
     "db:migrate": "pnpm --filter @smart-anchor/database prisma migrate dev",
-    "db:studio": "pnpm --filter @smart-anchor/database prisma studio"
+    "db:studio": "pnpm --filter @smart-anchor/database prisma studio",
+    "db:seed": "pnpm --filter @smart-anchor/api exec tsx src/seed/seed.ts",
+    "db:reset": "pnpm --filter @smart-anchor/api exec tsx src/seed/reset.ts",
+    "smoke:backend-core": "pnpm --filter @smart-anchor/api exec tsx scripts/smoke-backend-core.ts"
   },
   "devDependencies": {
     "prettier": "^3.6.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["bcrypt", "@scarf/scarf"],
+    "ignoredBuiltDependencies": []
   }
 }
