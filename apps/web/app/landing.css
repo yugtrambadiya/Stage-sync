@@ -174,7 +174,7 @@
 /* Shifted rows get a subtle animation to imply they just moved */
 .mock-agenda-row--shifted {
   animation: agenda-shift 4s ease-in-out infinite;
-  background: rgba(245, 158, 11, 0.03);
+  background: var(--color-warn-bg);
 }
 
 .mock-agenda-row__time {

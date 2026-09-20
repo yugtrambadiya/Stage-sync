@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import './UnifiedEventHeader.css';
+import { AccountMenu } from '../AccountMenu';
 
 interface UnifiedEventHeaderProps {
   eventId: string;
@@ -124,8 +125,8 @@ export function UnifiedEventHeader({
                 width: 6,
                 height: 6,
                 borderRadius: '50%',
-                background: '#34d399',
-                boxShadow: '0 0 8px #34d399',
+                background: 'var(--color-live)',
+                boxShadow: '0 0 8px var(--color-live)',
               }}
             />
             <span>● Live Control Room</span>
@@ -135,6 +136,8 @@ export function UnifiedEventHeader({
         )}
 
         {extraRightActions}
+
+        <AccountMenu />
       </div>
     </header>
   );

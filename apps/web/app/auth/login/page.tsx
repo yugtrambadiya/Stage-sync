@@ -16,7 +16,7 @@ export default function LoginPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated()) {
-      router.replace('/');
+      router.replace('/events');
     }
   }, [router]);
 
@@ -33,7 +33,7 @@ export default function LoginPage() {
 
     try {
       await login(email.trim(), password);
-      router.push('/');
+      router.push('/events');
     } catch (err: any) {
       setError(err.message || 'Sign-in failed. Please try again.');
     } finally {

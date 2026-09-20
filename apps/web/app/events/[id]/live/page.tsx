@@ -191,7 +191,7 @@ export default function LiveDashboardPage() {
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#06070a',
+        backgroundColor: 'var(--color-bg)',
         backgroundImage: `
           radial-gradient(ellipse 70% 45% at 50% -15%, rgba(99, 102, 241, 0.16) 0%, transparent 60%),
           radial-gradient(ellipse 55% 35% at 92% 15%, rgba(16, 185, 129, 0.09) 0%, transparent 50%),
@@ -280,7 +280,7 @@ export default function LiveDashboardPage() {
             flexWrap: 'wrap',
             gap: '10px',
             padding: '9px 18px',
-            background: 'rgba(10, 12, 22, 0.7)',
+            background: 'var(--color-surface)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             border: '1px solid rgba(255,255,255,0.07)',
@@ -294,13 +294,13 @@ export default function LiveDashboardPage() {
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
-                background: '#10b981',
-                boxShadow: '0 0 8px #10b981',
+                background: 'var(--color-live)',
+                boxShadow: '0 0 8px var(--color-live)',
                 animation: 'pulse-live 2s infinite',
                 flexShrink: 0,
               }}
             />
-            <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.09em', color: '#d1d5db', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.09em', color: 'var(--color-text-secondary)', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
               AUDITORIUM A — MAIN STAGE
             </span>
             <span style={{ color: 'rgba(255,255,255,0.15)' }}>·</span>
@@ -311,8 +311,8 @@ export default function LiveDashboardPage() {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span style={{ fontSize: '10.5px', color: 'var(--color-text-faint)', fontFamily: 'var(--font-mono)' }}>LATENCY: 14MS</span>
-            <div style={{ width: '1px', height: '12px', background: 'rgba(255,255,255,0.1)' }} />
-            <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#34d399', fontFamily: 'var(--font-mono)' }}>SYNC: ACTIVE</span>
+            <div style={{ width: '1px', height: '12px', background: 'var(--color-border)' }} />
+            <span style={{ fontSize: '10.5px', fontWeight: 700, color: 'var(--color-live)', fontFamily: 'var(--font-mono)' }}>SYNC: ACTIVE</span>
           </div>
         </div>
 
@@ -345,7 +345,7 @@ export default function LiveDashboardPage() {
             <div
               style={{
                 padding: '14px 18px',
-                background: 'rgba(10, 12, 22, 0.65)',
+                background: 'var(--color-surface)',
                 backdropFilter: 'blur(20px)',
                 border: '1px solid rgba(255,255,255,0.07)',
                 borderRadius: '16px',
@@ -356,7 +356,7 @@ export default function LiveDashboardPage() {
                 <span style={{ fontSize: '10.5px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
                   Director Actions
                 </span>
-                <span style={{ fontSize: '9px', color: '#34d399', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.25)', padding: '2px 7px', borderRadius: '4px', fontFamily: 'var(--font-mono)', fontWeight: 700, letterSpacing: '0.06em' }}>
+                <span style={{ fontSize: '9px', color: 'var(--color-live)', background: 'var(--color-live-bg)', border: '1px solid var(--color-live)', padding: '2px 7px', borderRadius: '4px', fontFamily: 'var(--font-mono)', fontWeight: 700, letterSpacing: '0.06em' }}>
                   HOTKEYS ACTIVE
                 </span>
               </div>
@@ -377,7 +377,7 @@ export default function LiveDashboardPage() {
                   }}
                 >
                   <span>✨ Script</span>
-                  <span className="kbd" style={{ background: 'rgba(255,255,255,0.22)', borderColor: 'rgba(255,255,255,0.35)', color: '#fff', fontWeight: 700, fontSize: '9px', minWidth: '14px', height: '14px' }}>G</span>
+                  <span className="kbd" style={{ background: 'rgba(255,255,255,0.22)', borderColor: 'rgba(255,255,255,0.35)', color: 'var(--color-text)', fontWeight: 700, fontSize: '9px', minWidth: '14px', height: '14px' }}>G</span>
                 </button>
 
                 <button
@@ -388,15 +388,15 @@ export default function LiveDashboardPage() {
                     gap: '5px',
                     padding: '9px 10px',
                     borderRadius: '10px',
-                    background: 'rgba(245, 158, 11, 0.1)',
-                    border: '1px solid rgba(245, 158, 11, 0.35)',
-                    color: '#fbbf24',
+                    background: 'var(--color-warn-bg)',
+                    border: '1px solid var(--color-warn)',
+                    color: 'var(--color-warn)',
                     fontWeight: 600,
                     fontSize: '11.5px',
                   }}
                 >
                   <span>⏱ Delay</span>
-                  <span className="kbd" style={{ background: 'rgba(245, 158, 11, 0.2)', borderColor: 'rgba(245, 158, 11, 0.4)', color: '#fbbf24', fontWeight: 700, fontSize: '9px', minWidth: '14px', height: '14px' }}>D</span>
+                  <span className="kbd" style={{ background: 'var(--color-warn-bg)', borderColor: 'var(--color-warn)', color: 'var(--color-warn)', fontWeight: 700, fontSize: '9px', minWidth: '14px', height: '14px' }}>D</span>
                 </button>
 
                 <button
@@ -407,15 +407,15 @@ export default function LiveDashboardPage() {
                     gap: '5px',
                     padding: '9px 10px',
                     borderRadius: '10px',
-                    background: 'rgba(6, 182, 212, 0.07)',
-                    border: '1px solid rgba(6, 182, 212, 0.22)',
-                    color: '#22d3ee',
+                    background: 'var(--color-accent-bg)',
+                    border: '1px solid var(--color-accent)',
+                    color: 'var(--color-accent)',
                     fontWeight: 600,
                     fontSize: '11.5px',
                   }}
                 >
                   <span>📣 Cast</span>
-                  <span className="kbd" style={{ background: 'rgba(6, 182, 212, 0.18)', borderColor: 'rgba(6, 182, 212, 0.35)', color: '#22d3ee', fontWeight: 700, fontSize: '9px', minWidth: '14px', height: '14px' }}>A</span>
+                  <span className="kbd" style={{ background: 'var(--color-accent-bg)', borderColor: 'var(--color-accent)', color: 'var(--color-accent)', fontWeight: 700, fontSize: '9px', minWidth: '14px', height: '14px' }}>A</span>
                 </button>
 
                 <button
@@ -655,7 +655,7 @@ export default function LiveDashboardPage() {
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(4, 5, 8, 0.65)',
+            background: 'rgba(0, 0, 0, 0.65)',
             backdropFilter: 'blur(8px)',
             WebkitBackdropFilter: 'blur(8px)',
             zIndex: 9999,
@@ -670,8 +670,8 @@ export default function LiveDashboardPage() {
               width: '100%',
               maxWidth: '440px',
               height: '100vh',
-              background: 'rgba(14, 18, 28, 0.98)',
-              borderLeft: '1px solid rgba(255, 255, 255, 0.12)',
+              background: 'var(--color-surface-elevated)',
+              borderLeft: '1px solid var(--color-border)',
               boxShadow: '-16px 0 48px rgba(0, 0, 0, 0.75)',
               display: 'flex',
               flexDirection: 'column',

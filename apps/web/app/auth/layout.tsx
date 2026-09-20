@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './auth.css';
+import AccountMenu from '../../components/AccountMenu';
 
 export const metadata: Metadata = {
   title: 'StageSync — Sign In',
@@ -19,11 +20,14 @@ export default function AuthLayout({
       </div>
 
       {/* Branding header */}
-      <header className="auth-layout__header">
+      <header className="auth-layout__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', maxWidth: '1200px', padding: '0 2rem' }}>
         <a href="/" className="auth-layout__brand">
           <span className="auth-layout__logo-icon" aria-hidden="true">◈</span>
           <span className="auth-layout__wordmark">StageSync</span>
         </a>
+        <div style={{ position: 'relative' }}>
+          <AccountMenu />
+        </div>
       </header>
 
       {/* Centered auth card */}

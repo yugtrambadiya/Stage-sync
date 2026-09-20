@@ -3,7 +3,7 @@
 .delay-modal {
   width: 90%;
   max-width: 540px;
-  background: rgba(16, 20, 30, 0.96);
+  background: var(--color-surface-elevated);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.12);

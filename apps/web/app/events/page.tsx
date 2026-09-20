@@ -51,7 +51,7 @@ export default function EventsPage() {
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '0 var(--space-6)',
-          background: 'rgba(13, 17, 23, 0.85)',
+          background: 'var(--color-surface)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
           borderBottom: '1px solid var(--color-border)',
@@ -84,7 +84,7 @@ export default function EventsPage() {
               color: 'var(--color-text-muted)',
               padding: '3px 9px',
               borderRadius: 'var(--radius-pill)',
-              background: 'rgba(255, 255, 255, 0.03)',
+              background: 'var(--color-surface-elevated)',
               border: '1px solid var(--color-border)',
             }}
           >

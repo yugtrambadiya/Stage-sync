@@ -345,8 +345,8 @@ export default function EventScriptsPage() {
                     fontWeight: 700,
                     padding: '1px 6px',
                     borderRadius: '4px',
-                    background: activeVoiceObj?.tier === 'neural' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(99, 102, 241, 0.2)',
-                    color: activeVoiceObj?.tier === 'neural' ? '#34d399' : '#a5b4fc',
+                    background: activeVoiceObj?.tier === 'neural' ? 'var(--color-live-bg)' : 'var(--color-accent-bg)',
+                    color: activeVoiceObj?.tier === 'neural' ? 'var(--color-live)' : 'var(--color-accent)',
                   }}
                 >
                   {activeVoiceObj?.tier === 'neural' ? '⚡ NEURAL' : '🎙️ HD STUDIO'}
@@ -378,7 +378,7 @@ export default function EventScriptsPage() {
             style={{
               marginTop: '16px',
               padding: '18px 22px',
-              background: 'rgba(10, 14, 24, 0.95)',
+              background: 'var(--color-surface-elevated)',
               border: '1px solid rgba(99, 102, 241, 0.35)',
               borderRadius: 'var(--radius-lg)',
               boxShadow: '0 16px 36px rgba(0, 0, 0, 0.5)',
@@ -391,7 +391,7 @@ export default function EventScriptsPage() {
             }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: '1 1 300px' }}>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#f8fafc', letterSpacing: '0.04em' }}>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text)', letterSpacing: '0.04em' }}>
                 SELECT BROADCAST PRESENTER VOICE PERSONA
               </span>
               <p style={{ margin: 0, fontSize: '11px', color: 'var(--color-text-muted)' }}>
@@ -437,7 +437,7 @@ export default function EventScriptsPage() {
                         fontSize: '11px',
                         fontWeight: 600,
                         borderRadius: 'var(--radius-sm)',
-                        background: speechRate === s.val ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.05)',
+                        background: speechRate === s.val ? 'var(--color-accent)' : 'var(--color-border-subtle)',
                         color: speechRate === s.val ? '#fff' : 'var(--color-text-secondary)',
                         border: '1px solid var(--color-border)',
                         cursor: 'pointer',
@@ -454,9 +454,9 @@ export default function EventScriptsPage() {
                 style={{
                   padding: '8px 16px',
                   borderRadius: 'var(--radius-pill)',
-                  background: 'rgba(16, 185, 129, 0.15)',
-                  border: '1px solid rgba(16, 185, 129, 0.4)',
-                  color: '#34d399',
+                  background: 'var(--color-live-bg)',
+                  border: '1px solid var(--color-live)',
+                  color: 'var(--color-live)',
                   fontSize: '12px',
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -727,9 +727,9 @@ export default function EventScriptsPage() {
                                 style={{
                                   padding: isCurrent ? '8px 12px' : '2px 0',
                                   borderRadius: 'var(--radius-sm)',
-                                  background: isCurrent ? 'rgba(245, 158, 11, 0.16)' : 'transparent',
-                                  borderLeft: isCurrent ? '3px solid #f59e0b' : '3px solid transparent',
-                                  color: isCurrent ? '#fef08a' : isSpeaking ? 'rgba(241, 245, 249, 0.65)' : '#f1f5f9',
+                                  background: isCurrent ? 'var(--color-warn-bg)' : 'transparent',
+                                  borderLeft: isCurrent ? '3px solid var(--color-warn)' : '3px solid transparent',
+                                  color: isCurrent ? 'var(--color-warn)' : isSpeaking ? 'var(--color-text-muted)' : 'var(--color-text)',
                                   boxShadow: isCurrent ? '0 0 20px rgba(245, 158, 11, 0.2)' : 'none',
                                   transition: 'all 0.2s ease',
                                 }}

@@ -34,7 +34,7 @@ export default function RegisterPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated()) {
-      router.replace('/');
+      router.replace('/events');
     }
   }, [router]);
 
@@ -62,7 +62,7 @@ export default function RegisterPage() {
 
     try {
       await register(email.trim(), password, name.trim());
-      router.push('/');
+      router.push('/events');
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.');
     } finally {

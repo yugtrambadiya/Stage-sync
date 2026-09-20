@@ -3,7 +3,7 @@
 .csc {
   overflow: hidden;
   position: relative;
-  background: linear-gradient(135deg, rgba(8, 10, 20, 0.98) 0%, rgba(12, 14, 26, 0.96) 100%);
+  background: var(--surface-glass);
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
   border: 1px solid rgba(99, 102, 241, 0.22);
@@ -73,7 +73,7 @@
   justify-content: space-between;
   padding: 11px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  background: rgba(255, 255, 255, 0.015);
+  background: var(--color-border-subtle);
   position: relative;
   z-index: 2;
 }

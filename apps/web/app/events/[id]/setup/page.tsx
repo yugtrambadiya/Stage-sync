@@ -429,7 +429,7 @@ export default function EventSetupPage() {
                                   letterSpacing: '0.06em',
                                   padding: '1px 6px',
                                   borderRadius: '4px',
-                                  background: item.status === 'DELAYED' ? 'rgba(245,158,11,0.12)' : 'rgba(255,255,255,0.04)',
+                                  background: item.status === 'DELAYED' ? 'var(--color-warn-bg)' : 'var(--color-surface-elevated)',
                                   border: '1px solid',
                                   borderColor: item.status === 'DELAYED' ? 'rgba(245,158,11,0.25)' : 'rgba(255,255,255,0.07)',
                                 }}
@@ -634,7 +634,7 @@ export default function EventSetupPage() {
                 </div>
 
                 {agError && (
-                  <div style={{ color: 'var(--color-danger)', fontSize: '12px', background: 'rgba(239, 68, 68, 0.1)', padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.25)' }}>
+                  <div style={{ color: 'var(--color-danger)', fontSize: '12px', background: 'var(--color-danger-bg, rgba(239,68,68,0.1))', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--color-danger)' }}>
                     {agError}
                   </div>
                 )}
@@ -710,7 +710,7 @@ export default function EventSetupPage() {
                 </div>
 
                 {spkError && (
-                  <div style={{ color: 'var(--color-danger)', fontSize: '12px', background: 'rgba(239, 68, 68, 0.1)', padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.25)' }}>
+                  <div style={{ color: 'var(--color-danger)', fontSize: '12px', background: 'var(--color-danger-bg, rgba(239,68,68,0.1))', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--color-danger)' }}>
                     {spkError}
                   </div>
                 )}
