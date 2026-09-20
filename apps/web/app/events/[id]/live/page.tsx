@@ -18,8 +18,8 @@ import { ScriptModal } from '@/components/ScriptModal/ScriptModal';
 import { DelayModal } from '@/components/DelayModal/DelayModal';
 import { UnifiedEventHeader } from '@/components/UnifiedEventHeader/UnifiedEventHeader';
 
-function formatClock(d: Date): string {
-  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+function formatTime(d: Date): string {
+  return d.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 }
 
 export default function LiveDashboardPage() {
@@ -777,7 +777,7 @@ export default function LiveDashboardPage() {
                           {log.type}
                         </span>
                         <span className="num" style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
-                          {new Date(log.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                          {new Date(log.at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit' })} IST
                         </span>
                       </div>
                       <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text)', lineHeight: 1.5, marginTop: '2px' }}>

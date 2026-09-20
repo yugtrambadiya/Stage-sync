@@ -38,28 +38,72 @@ const A = {
   CLOSING:     'agt_closing',
 };
 
+function getTodayIST(): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
+}
+
 /** Convert IST (Asia/Kolkata) time to UTC Date for a given date */
 function ist(date: string, timeHHMM: string): Date {
-  const [h, m] = timeHHMM.split(':').map(Number);
-  // IST = UTC + 5:30
-  const d = new Date(`${date}T00:00:00.000Z`);
-  d.setUTCHours(h - 5, m - 30, 0, 0);
-  if (m < 30) { d.setUTCHours(h - 6, m + 30, 0, 0); }
-  return d;
+  return new Date(`${date}T${timeHHMM}:00.000+05:30`);
+}
+
+function getBaseScheduleTimes(): { [key: string]: string } {
+  if (process.env.SEED_STATIC_TIMES === 'true') {
+    return {
+      [A.OPENING]: '09:00',
+      [A.KEYNOTE]: '09:30',
+      [A.WASM]: '10:30',
+      [A.PANEL]: '11:30',
+      [A.LUNCH]: '12:00',
+      [A.WORKSHOP]: '13:00',
+      [A.OPENSOURCE]: '14:30',
+      [A.HACKATHON]: '15:30',
+      [A.CLOSING]: '16:00',
+    };
+  }
+
+  // Dynamic IST anchor: position Keynote right at the current hour in IST
+  // so the broadcast room reflects live in-progress state right now!
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: false, hour: '2-digit', minute: '2-digit' });
+  const [currentHour] = timeStr.split(':').map(Number);
+  const kH = currentHour;
+
+  const fmt = (h: number, m: number) => {
+    const hh = ((h % 24) + 24) % 24;
+    const mm = ((m % 60) + 60) % 60;
+    return `${hh.toString().padStart(2, '0')}:${mm.toString().padStart(2, '0')}`;
+  };
+
+  return {
+    [A.OPENING]: fmt(kH - 1, 30),
+    [A.KEYNOTE]: fmt(kH, 0),
+    [A.WASM]: fmt(kH + 1, 0),
+    [A.PANEL]: fmt(kH + 2, 0),
+    [A.LUNCH]: fmt(kH + 2, 30),
+    [A.WORKSHOP]: fmt(kH + 3, 30),
+    [A.OPENSOURCE]: fmt(kH + 5, 0),
+    [A.HACKATHON]: fmt(kH + 6, 0),
+    [A.CLOSING]: fmt(kH + 6, 30),
+  };
 }
 
 const EVENT_DATE = process.env.SEED_EVENT_DATE && process.env.SEED_EVENT_DATE.trim() !== ''
   ? process.env.SEED_EVENT_DATE
-  : '2025-09-19';
+  : getTodayIST();
 const TZ = 'Asia/Kolkata';
 
 export async function runSeed(prisma: PrismaClient) {
-  console.log(`\n🌱  Seeding TechNova 2025 (date=${EVENT_DATE}) …`);
+  console.log(`\n🌱  Seeding TechNova 2025 (date=${EVENT_DATE}, TZ=${TZ}) …`);
 
   // ──── Event ────
   await prisma.event.upsert({
     where:  { id: EVENT_ID },
-    update: {},
+    update: {
+      date: new Date(`${EVENT_DATE}T00:00:00.000Z`),
+      timezone: TZ,
+      status: 'LIVE',
+    },
     create: {
       id:          EVENT_ID,
       name:        'TechNova 2025 — Annual Technical Symposium',
@@ -190,17 +234,25 @@ export async function runSeed(prisma: PrismaClient) {
     },
   ];
 
+  const times = getBaseScheduleTimes();
+
   for (const a of agendaData) {
+    const itemTime = times[a.id] ?? a.time;
+    const itemStartTime = ist(EVENT_DATE, itemTime);
     await prisma.agendaItem.upsert({
       where:  { id: a.id },
-      update: {},
+      update: {
+        startTime:       itemStartTime,
+        durationMinutes: a.duration,
+        status:          a.status,
+      },
       create: {
         id:              a.id,
         eventId:         EVENT_ID,
         speakerId:       a.speakerId,
         title:           a.title,
         description:     a.description,
-        startTime:       ist(EVENT_DATE, a.time),
+        startTime:       itemStartTime,
         durationMinutes: a.duration,
         status:          a.status,
       },

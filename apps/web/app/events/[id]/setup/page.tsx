@@ -9,7 +9,7 @@ import './setup.css';
 
 function formatTime(iso: string): string {
   try {
-    return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+    return new Date(iso).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: false });
   } catch {
     return '--:--';
   }
@@ -82,7 +82,12 @@ export default function EventSetupPage() {
   // Agenda form
   const [agTitle, setAgTitle] = useState('');
   const [agSpeakerId, setAgSpeakerId] = useState('');
-  const [agStartTime, setAgStartTime] = useState('2025-09-19T09:00');
+  const [agStartTime, setAgStartTime] = useState(() => {
+    const now = new Date();
+    const datePart = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(now);
+    const timePart = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: false, hour: '2-digit', minute: '2-digit' });
+    return `${datePart}T${timePart}`;
+  });
   const [agDuration, setAgDuration] = useState(30);
   const [agSubmitting, setAgSubmitting] = useState(false);
   const [agError, setAgError] = useState<string | null>(null);

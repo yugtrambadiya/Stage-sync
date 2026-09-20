@@ -20,7 +20,7 @@ import './scripts.css';
 function formatTimestamp(iso: string): { relative: string; absolute: string } {
   try {
     const d = new Date(iso);
-    const absolute = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const absolute = d.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' IST';
     const diffSec = Math.floor((Date.now() - d.getTime()) / 1000);
     let relative = 'Just now';
     if (diffSec >= 60 && diffSec < 3600) {

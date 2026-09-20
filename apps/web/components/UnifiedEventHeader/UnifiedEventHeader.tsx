@@ -25,7 +25,8 @@ export function UnifiedEventHeader({
     const updateTime = () => {
       const now = new Date();
       setTimecode(
-        now.toLocaleTimeString([], {
+        now.toLocaleTimeString('en-IN', {
+          timeZone: 'Asia/Kolkata',
           hour: '2-digit',
           minute: '2-digit',
           second: '2-digit',
@@ -105,9 +106,10 @@ export function UnifiedEventHeader({
       {/* ── Right: Realtime Timecode & Actions ── */}
       <div className="unified-header__right">
         {timecode && (
-          <div className="unified-header__clock" title="Master Broadcast Timecode">
+          <div className="unified-header__clock" title="Master Broadcast Timecode (Indian Standard Time · UTC+05:30)">
             <span className="unified-header__clock-dot" />
             <span>{timecode}</span>
+            <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--color-accent)', background: 'rgba(99, 102, 241, 0.15)', border: '1px solid rgba(99, 102, 241, 0.3)', padding: '1px 5px', borderRadius: '4px', letterSpacing: '0.05em' }}>IST</span>
           </div>
         )}
 

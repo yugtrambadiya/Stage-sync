@@ -63,6 +63,7 @@ export function CurrentSpeakerCard({ item, onDelay, onScript }: Props) {
   let remainingSec = rawRemainingSec;
   let progress = Math.min(100, Math.max(0, (elapsedMs / durationMs) * 100));
 
+  // Fallback for legacy static seed data (if event date is more than 3 hours away)
   if (Math.abs(rawRemainingSec) > 3600 * 3) {
     if (item.status === 'DELAYED') {
       const overrunSec = 165 + (Math.floor(nowMs / 1000) % 60);
@@ -93,7 +94,6 @@ export function CurrentSpeakerCard({ item, onDelay, onScript }: Props) {
 
   return (
     <div className={`csc ${statusClass}`}>
-      {/* ── Compact Top Strip ── */}
       <div className="csc__header">
         <div className="csc__badge-group">
           <span className="badge badge--live">
@@ -112,61 +112,44 @@ export function CurrentSpeakerCard({ item, onDelay, onScript }: Props) {
         </div>
       </div>
 
-      {/* ── Structured Command Body ── */}
       <div className="csc__body">
-        {/* Upper Deck: Speaker Identity (Left) & Broadcast Timecode + Quick Actions (Right) */}
-        <div className="csc__upper">
-          {/* Left: Speaker Identity */}
-          <div className="csc__speaker-block">
-            <div className="csc__avatar" title={speakerName}>
-              {initials}
-              <span className="csc__avatar-mic" title="Mic Live" />
-            </div>
-            <div className="csc__speaker-info">
-              <div className="csc__speaker-name">{speakerName}</div>
-              <div className="csc__speaker-role">
-                {item.speaker?.organization ? item.speaker.organization : 'Featured Keynote Speaker'}
-              </div>
-            </div>
+        {/* Speaker Profile Header */}
+        <div className="csc__profile">
+          <div className="csc__avatar" title={speakerName}>
+            {initials}
+            <span className="csc__avatar-mic" title="Mic Live" />
           </div>
-
-          {/* Right: Broadcast Timer & Direct Director Actions */}
-          <div className="csc__timer-block">
-            <div className="csc__timer-header">
-              <span className="csc__timer-label">
-                <span className={`csc__hud-indicator ${isOverrun ? 'csc__hud-indicator--overrun' : isWarning ? 'csc__hud-indicator--warn' : 'csc__hud-indicator--live'}`} />
-                {isOverrun ? 'OVERRUN' : 'REMAINING'}
-              </span>
-              <span className="csc__timer-total num">Total: {item.durationMinutes}m</span>
-            </div>
-
-            <div className={timerClass} suppressHydrationWarning>
-              {formatSeconds(remainingSec)}
-            </div>
-
-            <div className="csc__timer-actions">
-              <button className="csc__action-btn csc__action-btn--hero" onClick={onScript} title="Generate AI transition announcement">
-                <span>✨ Script</span>
-                <kbd className="csc__kbd">G</kbd>
-              </button>
-              <button className="csc__delay-action-btn" onClick={onDelay} title="Mark schedule delay and cascade downstream">
-                <span className="csc__delay-action-text">⏱ Delay</span>
-                <kbd className="csc__kbd csc__kbd--warn">D</kbd>
-              </button>
-            </div>
+          <div className="csc__details">
+            <div className="csc__speaker">{speakerName}</div>
+            {item.speaker?.organization && (
+              <div className="csc__org">{item.speaker.organization}</div>
+            )}
           </div>
         </div>
 
-        {/* Hairline horizontal separator */}
-        <div className="csc__separator" />
+        {/* Session Title */}
+        <div className="csc__title-card">
+          <span className="csc__title-tag">CURRENT KEYNOTE</span>
+          <div className="csc__title">{item.title}</div>
+        </div>
 
-        {/* Lower Deck: Session Title & Live Progress Telemetry */}
-        <div className="csc__lower">
-          <div className="csc__session-strip">
-            <span className="csc__title-tag">NOW PRESENTING</span>
-            <div className="csc__title" title={item.title}>{item.title}</div>
+        {/* Live Countdown HUD */}
+        <div className="csc__hud">
+          <div className="csc__hud-top">
+            <span className="csc__hud-label">
+              <span className={`csc__hud-indicator ${isOverrun ? 'csc__hud-indicator--overrun' : isWarning ? 'csc__hud-indicator--warn' : 'csc__hud-indicator--live'}`} />
+              {isOverrun ? 'OVERRUN TIME' : 'TIME REMAINING'}
+            </span>
+            <span className="csc__hud-total num">
+              Total: {item.durationMinutes}m
+            </span>
           </div>
 
+          <div className={timerClass} suppressHydrationWarning>
+            {formatSeconds(remainingSec)}
+          </div>
+
+          {/* Progress Bar & Status Pill */}
           <div className="csc__progress-container">
             <div className="csc__progress" suppressHydrationWarning>
               <div
@@ -176,13 +159,25 @@ export function CurrentSpeakerCard({ item, onDelay, onScript }: Props) {
             </div>
             <div className="csc__progress-labels">
               <span className="csc__progress-sub">
-                {isOverrun ? '⚠️ Schedule delayed downstream — cascade active' : 'Active presentation pace on schedule'}
+                {isOverrun ? 'Schedule delayed downstream' : 'Active presentation pace'}
               </span>
               <span className="csc__progress-pct num" suppressHydrationWarning>
-                {Math.round(progress)}% {isOverrun ? 'OVERRUN' : 'ELAPSED'}
+                {Math.round(progress)}% ELAPSED
               </span>
             </div>
           </div>
+        </div>
+
+        {/* Action Controls */}
+        <div className="csc__actions">
+          <button className="btn btn--primary csc__action-btn csc__action-btn--hero" onClick={onScript} title="Generate AI transition announcement">
+            <span>✨ Generate Script</span>
+            <kbd className="csc__kbd">G</kbd>
+          </button>
+          <button className="csc__delay-action-btn" onClick={onDelay} title="Mark schedule delay and cascade downstream">
+            <span className="csc__delay-action-text">⏱️ Mark Delay</span>
+            <kbd className="csc__kbd csc__kbd--warn">D</kbd>
+          </button>
         </div>
       </div>
     </div>
