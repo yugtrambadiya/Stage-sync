@@ -271,77 +271,132 @@ export default function LiveDashboardPage() {
           </div>
         )}
 
-        {/* Two-column control room */}
+        {/* Executive Stage Telemetry Bar */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '12px',
+            padding: '12px 20px',
+            background: 'var(--surface-glass)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-pill)',
+            boxShadow: 'var(--shadow-card)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span
+              style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                background: '#10b981',
+                boxShadow: '0 0 10px #10b981',
+                animation: 'pulse-live 2s infinite',
+              }}
+            />
+            <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '0.08em', color: '#f8fafc', textTransform: 'uppercase' }}>
+              MAIN BROADCAST STAGE: AUDITORIUM A
+            </span>
+            <span style={{ color: 'var(--color-border)' }}>·</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
+              {agenda.length} Scheduled Sessions
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontSize: '12px' }}>📡</span>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-mono)' }}>
+                LATENCY: 14MS
+              </span>
+            </div>
+            <div style={{ width: '1px', height: '14px', background: 'var(--color-border)' }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>AUTO-SYNC:</span>
+              <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: '#34d399' }}>
+                ACTIVE
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Two-column control room with commanding Spotlight on Left */}
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'minmax(380px, 1.25fr) minmax(320px, 0.95fr)',
+            gridTemplateColumns: 'minmax(440px, 1.35fr) minmax(340px, 0.95fr)',
             gap: 'var(--space-6)',
             alignItems: 'start',
           }}
           className="control-room-grid"
         >
-          {/* Left Column: Agenda Timeline */}
-          <section style={{ height: '100%' }}>
-            <AgendaTimeline
-              items={agenda}
-              loading={loading}
-              lastDiff={lastDiff}
-              onDismissDiff={() => setLastDiff(null)}
-              onDelayItem={(item) => {
-                setTargetDelayItem(item);
-                setDelayModalOpen(true);
-              }}
-            />
-          </section>
-
-          {/* Right Column: Stage Controls */}
-          <section style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', position: 'sticky', top: 'calc(60px + var(--space-4))' }}>
-            {/* 1. NOW ON STAGE */}
+          {/* Left Column: Spotlight Live Console & Upcoming Flow */}
+          <section style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+            {/* 1. NOW ON STAGE SPOTLIGHT */}
             <CurrentSpeakerCard
               item={currentSession}
               onDelay={handleOpenDelayForCurrent}
               onScript={() => handleOpenScript(0, 'TRANSITION')}
             />
 
-            {/* 2. UP NEXT */}
+            {/* 2. UP NEXT FLOW */}
             <NextUpCard
               item={nextSession}
               onScript={() => handleOpenScript(0, 'TRANSITION')}
             />
 
             {/* 3. BROADCAST ACTIONS PANEL */}
-            <div className="panel" style={{ padding: 'var(--space-4)', background: 'rgba(13, 16, 26, 0.85)', backdropFilter: 'blur(16px)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xl)', boxShadow: '0 12px 28px -8px rgba(0,0,0,0.5)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
-                <span className="panel__title" style={{ margin: 0, padding: 0, border: 'none', background: 'transparent', fontSize: 'var(--text-xs)', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-                  Stage Director Quick Actions
-                </span>
+            <div
+              className="panel"
+              style={{
+                padding: 'var(--space-5)',
+                background: 'var(--surface-glass)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-xl)',
+                boxShadow: 'var(--shadow-card)',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '14px' }}>⚡</span>
+                  <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
+                    Stage Director Quick Actions
+                  </span>
+                </div>
                 <span style={{ fontSize: '10px', color: 'var(--color-live)', background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '2px 8px', borderRadius: 'var(--radius-pill)', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
-                  HOTKEYS LIVE
+                  HOTKEYS ACTIVE
                 </span>
               </div>
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
                 <button
                   className="btn btn--primary btn--sm"
                   onClick={() => handleOpenScript(0, 'TRANSITION')}
                   style={{
                     justifyContent: 'space-between',
-                    padding: '10px 14px',
+                    padding: '12px 16px',
                     borderRadius: 'var(--radius-md)',
                     background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                    boxShadow: '0 4px 14px rgba(99, 102, 241, 0.35)',
+                    boxShadow: '0 4px 16px rgba(99, 102, 241, 0.4)',
                     fontWeight: 600,
                   }}
                 >
-                  <span>✨ Generate Script</span>
+                  <span>✨ Generate AI Script</span>
                   <span className="kbd" style={{ background: 'rgba(255,255,255,0.22)', borderColor: 'rgba(255,255,255,0.35)', color: '#fff', fontWeight: 700 }}>G</span>
                 </button>
+
                 <button
                   className="btn btn--sm"
                   onClick={handleOpenDelayForCurrent}
                   style={{
                     justifyContent: 'space-between',
-                    padding: '10px 14px',
+                    padding: '12px 16px',
                     borderRadius: 'var(--radius-md)',
                     background: 'rgba(245, 158, 11, 0.12)',
                     border: '1px solid rgba(245, 158, 11, 0.4)',
@@ -352,12 +407,13 @@ export default function LiveDashboardPage() {
                   <span>⏱️ Mark Delay</span>
                   <span className="kbd" style={{ background: 'rgba(245, 158, 11, 0.25)', borderColor: 'rgba(245, 158, 11, 0.5)', color: '#fbbf24', fontWeight: 700 }}>D</span>
                 </button>
+
                 <button
                   className="btn btn--ghost btn--sm"
                   onClick={() => setAnnounceModalOpen(true)}
                   style={{
                     justifyContent: 'space-between',
-                    padding: '10px 14px',
+                    padding: '12px 16px',
                     borderRadius: 'var(--radius-md)',
                     background: 'rgba(6, 182, 212, 0.08)',
                     border: '1px solid rgba(6, 182, 212, 0.25)',
@@ -365,15 +421,16 @@ export default function LiveDashboardPage() {
                     fontWeight: 600,
                   }}
                 >
-                  <span>📣 Announce</span>
+                  <span>📣 Stage Broadcast</span>
                   <span className="kbd" style={{ background: 'rgba(6, 182, 212, 0.2)', borderColor: 'rgba(6, 182, 212, 0.4)', color: '#22d3ee', fontWeight: 700 }}>A</span>
                 </button>
+
                 <button
                   className="btn btn--ghost btn--sm"
                   onClick={() => setShortcutsOpen(true)}
                   style={{
                     justifyContent: 'space-between',
-                    padding: '10px 14px',
+                    padding: '12px 16px',
                     borderRadius: 'var(--radius-md)',
                     background: 'rgba(255, 255, 255, 0.03)',
                     border: '1px solid var(--color-border)',
@@ -381,11 +438,25 @@ export default function LiveDashboardPage() {
                     fontWeight: 600,
                   }}
                 >
-                  <span>⌨️ Shortcuts</span>
+                  <span>⌨️ Hotkey Palette</span>
                   <span className="kbd" style={{ fontWeight: 700 }}>?</span>
                 </button>
               </div>
             </div>
+          </section>
+
+          {/* Right Column: Master Stage Timeline Rundown */}
+          <section style={{ height: '100%', position: 'sticky', top: 'calc(60px + var(--space-4))' }}>
+            <AgendaTimeline
+              items={agenda}
+              loading={loading}
+              lastDiff={lastDiff}
+              onDismissDiff={() => setLastDiff(null)}
+              onDelayItem={(item) => {
+                setTargetDelayItem(item);
+                setDelayModalOpen(true);
+              }}
+            />
           </section>
         </div>
       </main>

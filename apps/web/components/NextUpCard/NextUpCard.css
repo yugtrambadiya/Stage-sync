@@ -1,26 +1,27 @@
 /* ─── Modern Next Up Preview Card ────────────────────────────────────────── */
 
 .nuc {
-  background: rgba(13, 16, 26, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: var(--surface-glass);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
-  box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   overflow: hidden;
   transition: all var(--dur-fast) var(--ease-out);
 }
 
 .nuc:hover {
   border-color: var(--color-border-hover);
-  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.6), 0 0 20px -4px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 20px 48px -10px rgba(0, 0, 0, 0.7), 0 0 24px -4px rgba(99, 102, 241, 0.25);
+  transform: translateY(-2px);
 }
 
 .nuc__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 20px;
+  padding: 14px 24px;
   border-bottom: 1px solid var(--color-border-subtle);
   background: rgba(255, 255, 255, 0.02);
 }

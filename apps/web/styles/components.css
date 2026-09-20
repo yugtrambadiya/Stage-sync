@@ -179,31 +179,56 @@
    ══════════════════════════════════════════════════════════════════════════ */
 
 .card {
-  background: var(--color-surface);
+  background: var(--surface-glass);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   padding: var(--space-6);
   box-shadow: var(--shadow-card);
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
               border-color 0.2s ease;
   will-change: transform, box-shadow;
+  position: relative;
 }
 
 .card:hover {
   border-color: var(--color-border-hover);
-  transform: translateY(-3px);
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6), 0 0 24px -4px var(--color-accent-glow);
+  transform: translateY(-2px);
+  box-shadow: 0 24px 56px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.spotlight-card {
+  background: var(--surface-spotlight);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(99, 102, 241, 0.22);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-7);
+  box-shadow: var(--shadow-spotlight);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.spotlight-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.35) 25%, rgba(99, 102, 241, 0.6) 75%, transparent 100%);
+  pointer-events: none;
 }
 
 .panel {
-  background: var(--color-surface);
+  background: var(--surface-glass);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: var(--shadow-card);
   transition: border-color var(--dur-fast) var(--ease-out),
