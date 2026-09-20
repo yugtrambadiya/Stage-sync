@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import './UnifiedEventHeader.css';
-import { AccountMenu } from '../AccountMenu';
+import AccountMenu from '../AccountMenu';
 
 interface UnifiedEventHeaderProps {
   eventId: string;
